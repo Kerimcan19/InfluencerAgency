@@ -1,0 +1,17 @@
+Dashboard 2 kere getreports atıyor (2)
+Dashboard yüklenmesi uzun sürüyor (2)
+Dashboard refresh ve quickink kosmetik (1)
+
+Campaigns Table görünümü bozuk (2)
+Campaigns date seçimi bozuk (2)
+Campaigns Status araması kosmetik (1)
+campaigns date yanlış format (1)
+
+GenerateLink nerdeyse tamamen kosmetik(3)
+
+Reports yüklenirken veriler 0 gözüküyor (1)
+Reports Filtreler custom range çalışmıyor (1)
+Reports Exxcel verileri almıyor (1)
+
+forgot password çalışan yapıalcak
+Refresh hep dashboarda atıyor

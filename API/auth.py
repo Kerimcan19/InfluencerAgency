@@ -1,0 +1,37 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from core.models import User
+from core.schemas import TokenRequest, TokenResponse, TokenData, UserOut
+from usecases.auth_use import verify_password, create_access_token, get_current_user
+from database import get_db
+from datetime import datetime, timedelta
+
+router = APIRouter( tags=["Auth"])
+
+@router.post("/login", response_model=TokenResponse)
+def login(request: TokenRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == request.username).first()
+    if not user or not verify_password(request.password, user.passwordHash):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    access_token = create_access_token({
+        "sub": str(user.id),
+        "role": user.role
+    })
+
+    return TokenResponse(
+        data=TokenData(accessToken=access_token, expiration=None),  # Optional: return token expiry
+        isSuccess=True,
+        message=None,
+        type=0
+    )
+
+@router.get("/users/me", response_model=UserOut, tags=["Users"])
+def read_users_me(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    user = db.query(User).filter(User.id == current_user["sub"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
