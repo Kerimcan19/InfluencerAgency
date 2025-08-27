@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session, selectinload
 from database import get_db, frontend_url
 from core.models import Campaign, Report, User, TrackingLink, ActivityLog
 from core.schemas import CampaignListResponse, CampaignOut, ReportOut, ReportListResponse, GenerateLinkRequest, GenerateLinkResponse, GeneratedLinkData
-from usecases.auth_use import get_current_user
+from core.schemas import ResetPasswordRequest
+from usecases.auth_use import get_current_user, create_link_token, decode_access_token, hash_password
 from typing import Optional
 from datetime import datetime
 import logging
@@ -66,70 +67,23 @@ def get_campaigns(
         "type": 0
     }
 
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    reset_token = decode_access_token(request.token)
+    if not reset_token:
+        raise HTTPException(status_code=400, detail="Invalid token")
 
-@router.put("/Affiliate/GenerateLink", response_model=GenerateLinkResponse)
-def generate_link(
-    body: GenerateLinkRequest,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    user = db.query(User).filter(User.id == current_user["sub"]).first()
+    user = db.query(User).filter(User.id == reset_token["sub"]).first()
+    logger.info(f"Resetting password {reset_token}")
+    print(reset_token)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if reset_token["purpose"] != "password_reset":
+        raise HTTPException(status_code=400, detail="Invalid token")
+    if request.new_password != request.confirm_password:
+        raise HTTPException(status_code=400, detail="Passwords do not match")
 
-    if not user or user.role not in ["company", "admin"]:
-        raise HTTPException(status_code=403, detail="Access denied")
+    user.passwordHash = hash_password(request.new_password)
+    db.commit()
 
-    campaign = db.query(Campaign).filter(Campaign.id == body.campaignID).first()
-
-    if not campaign:
-        return {
-            "data": None,
-            "isSuccess": False,
-            "message": "Campaign not found",
-            "type": 1
-        }
-
-    if user.role == "company" and campaign.company_id != user.company_id:
-        raise HTTPException(status_code=403, detail="You are not authorized to modify this campaign")
-
-    # Create new link
-    a = datetime.utcnow()
-    new_link = TrackingLink(
-        influencer_id=body.influencerID,
-        influencer_name=body.influencerName,
-        campaignId=body.campaignID,
-        company_id = campaign.company_id,
-        generated_url=f"{frontend_url}/track/{body.influencerID}/{body.campaignID}",
-        token = "placeholder_token3",
-        status = "active",
-        source = "local",
-        click_count = 0,
-        createdAt=datetime.utcnow()
-    )
-    log = ActivityLog(
-        company_id= campaign.company_id,
-        type="Link generated",
-        label= body.influencerName  # or link URL
-    )
-    try:
-        db.add(new_link)
-        db.add(log)
-        db.commit()
-        db.refresh(new_link)
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Error: {e}")
-        raise HTTPException(status_code=500)
-
-    response_data = GeneratedLinkData(
-        campaignID=campaign.id,
-        name=campaign.name,
-        endDate=campaign.endDate,
-        url=new_link.generated_url
-    )
-
-    return {
-        "data": response_data,
-        "isSuccess": True,
-        "message": None,
-        "type": 0
-    }
+    return {"message": "Password reset successful"}

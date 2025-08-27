@@ -31,6 +31,17 @@ class InfluencerCreate(BaseModel):
     profile_image: Optional[str] = None
     active: bool = True
 
+class InfluencerBase(BaseModel):
+    username: str
+    display_name: str
+    email: EmailStr
+    phone: Optional[str]
+    profile_image: Optional[str]
+    active: bool
+
+class InfluencerOut(InfluencerBase):
+    id: int
+
 class TokenData(BaseModel):
     accessToken: str
     expiration: Optional[datetime] = None
@@ -253,3 +264,8 @@ class ActivityOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+    confirm_password: str

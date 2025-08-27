@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -8,11 +9,11 @@ import { GenerateLinkPage } from './pages/GenerateLinkPage';
 import { Toast } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { useAuth } from './contexts/AuthContext';
-import  CompaniesPage  from './pages/CompaniesPage';
+import CompaniesPage from './pages/CompaniesPage';
 import InfluencersPage from './pages/InfluencersPage';
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 type Page = 'dashboard' | 'campaigns' | 'reports' | 'generate-link' | 'companies' | 'influencers';
-
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
@@ -21,64 +22,71 @@ function App() {
   const { token, login, logout } = useAuth();
 
   const handleLogin = (token: string) => {
-    login(token); // stores token in localStorage
+    login(token);
     addToast('Welcome back! Successfully logged in.', 'success');
   };
 
   const handleLogout = () => {
-    logout(); // clears token
+    logout();
     setCurrentPage('dashboard');
     addToast('Successfully logged out.', 'success');
   };
 
-  if (!token) {
-    return (
-      <>
-        <LoginPage onLogin={handleLogin} />
-        <Toast toasts={toasts} onRemove={removeToast} />
-      </>
-    );
-  }
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <DashboardPage onAddToast={addToast} />;
-      case 'campaigns':
-        return <CampaignsPage onAddToast={addToast} />;
-      case 'reports':
-        return <ReportsPage onAddToast={addToast} />;
-      case 'generate-link':
-        return <GenerateLinkPage onAddToast={addToast} />;
-      case 'companies':
-        return <CompaniesPage />;
-      case 'influencers':
-        return <InfluencersPage />;
-      default:
-        return <DashboardPage onAddToast={addToast} />;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-        onLogout={handleLogout}
-      />
-
-      <div className="lg:pl-64">
-        <main className="py-6">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {renderPage()}
-          </div>
-        </main>
-      </div>
-
-      <Toast toasts={toasts} onRemove={removeToast} />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/reset-password"
+          element={<ResetPasswordPage />}
+        />
+        <Route
+          path="*"
+          element={
+            !token ? (
+              <>
+                <LoginPage onLogin={handleLogin} />
+                <Toast toasts={toasts} onRemove={removeToast} />
+              </>
+            ) : (
+              <div className="min-h-screen bg-gray-50">
+                <Sidebar
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                  isOpen={sidebarOpen}
+                  onToggle={() => setSidebarOpen(!sidebarOpen)}
+                  onLogout={handleLogout}
+                />
+                <div className="lg:pl-64">
+                  <main className="py-6">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                      {(() => {
+                        switch (currentPage) {
+                          case 'dashboard':
+                            return <DashboardPage onAddToast={addToast} />;
+                          case 'campaigns':
+                            return <CampaignsPage onAddToast={addToast} />;
+                          case 'reports':
+                            return <ReportsPage onAddToast={addToast} />;
+                          case 'generate-link':
+                            return <GenerateLinkPage onAddToast={addToast} />;
+                          case 'companies':
+                            return <CompaniesPage />;
+                          case 'influencers':
+                            return <InfluencersPage />;
+                          default:
+                            return <DashboardPage onAddToast={addToast} />;
+                        }
+                      })()}
+                    </div>
+                  </main>
+                </div>
+                <Toast toasts={toasts} onRemove={removeToast} />
+              </div>
+            )
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

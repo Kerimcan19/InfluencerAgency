@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from API import user, admin, auth, reports, dashboard, routes
+from API import user, admin, auth, reports, dashboard, routes, link
 from database import engine
 from core.models import Base
 
@@ -21,5 +21,4 @@ app.include_router(auth.router)
 app.include_router(reports.router)
 app.include_router(dashboard.router)
 app.include_router(routes.router)
-
-#Base.metadata.create_all(bind=engine)
+app.include_router(link.router)

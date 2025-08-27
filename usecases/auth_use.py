@@ -11,9 +11,16 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+LINK_SECRET_KEY = os.getenv("LINK_SECRET_KEY") 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60*12
+LINK_TOKEN_EXPIRE_MINUTES = 60*24*30
 
+def create_link_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (timedelta(minutes=LINK_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()

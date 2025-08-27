@@ -236,6 +236,7 @@ def get_influencer_detail(
     if not inf:
         raise HTTPException(status_code=404, detail="Influencer not found")
 
+
     return {
         "isSuccess": True,
         "message": None,

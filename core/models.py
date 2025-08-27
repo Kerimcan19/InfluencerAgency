@@ -17,6 +17,7 @@ class User(Base):
     role = Column(String, default='user')  # 'admin' | 'influencer' | 'company'
 
     company = relationship("Company", back_populates="users")
+    influencer = relationship("Influencer", back_populates="user", uselist=False)
 
 
 
@@ -57,7 +58,7 @@ class Influencer(Base):
 
     active = Column(Boolean, default=True)
 
-    # Relationships (owned here, not on User)
+    user = relationship("User", back_populates="influencer", uselist=False)
     reports = relationship("Report", back_populates="influencer")
     campaigns = relationship("Campaign", secondary="campaign_influencers", back_populates="influencers")
     links = relationship("TrackingLink", back_populates="influencer")
@@ -85,6 +86,7 @@ class Campaign(Base):
     brandCommissionRate = Column(Numeric(5, 2))
     influencerCommissionRate = Column(Numeric(5, 2))
     otherCostsRate = Column(Numeric(5, 2))
+    startDate = Column(DateTime, default=datetime.utcnow)
     endDate = Column(DateTime)
     brandingImage = Column(String)
 
@@ -94,7 +96,6 @@ class Campaign(Base):
     reports = relationship("Report", back_populates="campaign", cascade="all, delete-orphan")
     influencers = relationship("Influencer", secondary="campaign_influencers", back_populates="campaigns")
 
-    # removed Campaign.influencer relation to User per your request
 
     mlink_id = Column(String(64), unique=True, nullable=True)
     source = Column(String(16), default='mlink')
@@ -135,13 +136,13 @@ class TrackingLink(Base):
     influencer = relationship("Influencer", back_populates="links")
     campaign = relationship("Campaign", back_populates="links", foreign_keys=[campaignId])
 
-    token = Column(String(64), unique=True, index=True, nullable=False)
-    generated_url = Column(String, nullable=False)  # your public short link (e.g., /r/{token})
-    landing_url = Column(String, nullable=True)     # current destination; can switch to MLink later
+    token = Column(String(512), unique=True, index=True, nullable=False)
+    generated_url = Column(String(512), nullable=False)  # your public short link (e.g., /r/{token})
+    landing_url = Column(String(512), nullable=True)     # current destination; can switch to MLink later
     status = Column(String(16), default='active')
     source = Column(String(16), default='local')
     mlink_id = Column(String(64), unique=True, nullable=True)   
-    mlink_url = Column(String, nullable=True)
+    mlink_url = Column(String(512), nullable=True)
 
     # NEW: simple aggregate counter (fast and tiny)
     click_count = Column(Integer, default=0, nullable=False)
