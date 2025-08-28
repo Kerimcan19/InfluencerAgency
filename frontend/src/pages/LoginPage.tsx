@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { login } from '../services/api';
+import { useLang, translations } from '../contexts/LangContext';
 
 interface LoginPageProps {
   onLogin: (token: string) => void;
@@ -11,6 +12,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,26 +47,25 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           </div>
           
           <h1 className="text-4xl font-bold text-white mb-6">
-            Smart Influencer Marketing Platform
+            {t('SmartPlatform')}
           </h1>
           
           <p className="text-xl text-slate-300 leading-relaxed">
-            Manage campaigns, track performance, and maximize your affiliate marketing ROI 
-            with our intelligent dashboard built for marketing professionals.
+            {t('Manage campaigns, track performance, and maximize your affiliate marketing ROI with our intelligent dashboard built for marketing professionals.')}
           </p>
           
           <div className="mt-12 space-y-4">
             <div className="flex items-center space-x-3 text-slate-300">
               <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
-              <span>Real-time campaign analytics</span>
+              <span>{t('RealTimeAnalytics')}</span>
             </div>
             <div className="flex items-center space-x-3 text-slate-300">
               <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-              <span>Automated link generation</span>
+              <span>{t('AutomatedLink')}</span>
             </div>
             <div className="flex items-center space-x-3 text-slate-300">
               <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
-              <span>Advanced performance reports</span>
+              <span>{t('AdvancedReports')}</span>
             </div>
           </div>
         </div>
@@ -82,17 +84,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-              Welcome back
+              {t('WelcomeBack')}
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Sign in to your agency dashboard
+              {t('SignInDashboard')}
             </p>
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
+                {t('Username')}
               </label>
               <div className="mt-1">
                 <input
@@ -103,14 +105,14 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
-                  placeholder="Enter your username"
+                  placeholder={t('Username')}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                {t('Password')}
               </label>
               <div className="mt-1 relative">
                 <input
@@ -121,7 +123,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 pr-10 placeholder-gray-400 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-purple-500 sm:text-sm"
-                  placeholder="Enter your password"
+                  placeholder={t('Password')}
                 />
                 <button
                   type="button"
@@ -146,13 +148,13 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
+                  {t('RememberMe')}
                 </label>
               </div>
 
               <div className="text-sm">
                 <a href="#" className="font-medium text-purple-600 hover:text-purple-500">
-                  Forgot password?
+                  {t('ForgotPassword')}
                 </a>
               </div>
             </div>
@@ -166,10 +168,10 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 {isLoading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Signing in...</span>
+                    <span>{t('SigningIn')}</span>
                   </div>
                 ) : (
-                  'Sign in'
+                  t('SignIn')
                 )}
               </button>
             </div>

@@ -50,8 +50,8 @@ def read_users_me(
             "info": company_out
         }
     if current_user["role"] == "influencer":
-        user_influencer = db.query(Influencer).filter(Influencer.id == user.influencer_id).first()
-        influencer_out = InfluencerOut.model_validate(user_influencer) if user_influencer else None
+        user_influencer = db.query(Influencer).filter(Influencer.user_id == user.id).first()
+        influencer_out = InfluencerOut.model_validate(user_influencer, from_attributes=True) if user_influencer else None
         return {
             "user": user_out,
             "info": influencer_out

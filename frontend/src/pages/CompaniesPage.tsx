@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../services/api';
 import { Search, Edit, Eye, X, Save, RefreshCw, PlusCircle } from 'lucide-react';
+import { useLang, translations } from '../contexts/LangContext';
 
 type Company = {
   id: number;
@@ -54,9 +55,11 @@ type CompanyCreatePayload = {
 
 const CompaniesPage: React.FC = () => {
   const { user } = useAuth() as any;
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
 
   // Admin-only guard (UI side; backend still checks too)
-  if (!user || user.role !== 'admin') {
+  if (!user || user.user.role !== 'admin') {
     return null; // or <div className="p-6">Yetkisiz</div>
   }
 
@@ -246,19 +249,19 @@ const CompaniesPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Şirketler</h1>
+        <h1 className="text-2xl font-semibold">{t('Companies')}</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenCreate}
             className="inline-flex items-center gap-2 rounded-xl px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
           >
-            <PlusCircle className="w-4 h-4" /> Yeni Şirket
+            <PlusCircle className="w-4 h-4" /> {t('NewCompany')}
           </button>
           <button
             onClick={fetchCompanies}
             className="inline-flex items-center gap-2 rounded-xl px-3 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100"
           >
-            <RefreshCw className="w-4 h-4" /> Yenile
+            <RefreshCw className="w-4 h-4" /> {t('Refresh')}
           </button>
         </div>
       </div>
@@ -267,19 +270,19 @@ const CompaniesPage: React.FC = () => {
       <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <FilterInput
           icon={<Search className="w-4 h-4 text-gray-500" />}
-          placeholder="Ad ile ara"
+          placeholder={t('Search')}
           value={filters.name}
           onChange={(v) => setFilters((f) => ({ ...f, name: v }))}
         />
         <FilterInput
           icon={<Search className="w-4 h-4 text-gray-500" />}
-          placeholder="E-posta ile ara"
+          placeholder={t('Email')}
           value={filters.email}
           onChange={(v) => setFilters((f) => ({ ...f, email: v }))}
         />
         <FilterInput
           icon={<Search className="w-4 h-4 text-gray-500" />}
-          placeholder="Telefon ile ara"
+          placeholder={t('Phone')}
           value={filters.telefon}
           onChange={(v) => setFilters((f) => ({ ...f, telefon: v }))}
         />
@@ -291,7 +294,7 @@ const CompaniesPage: React.FC = () => {
           disabled={loading}
           className="rounded-xl bg-black text-white px-4 py-2 hover:opacity-90 disabled:opacity-60"
         >
-          {loading ? 'Yükleniyor…' : 'Filtrele'}
+          {loading ? t('loading') : t('Filter')}
         </button>
       </div>
 
@@ -311,11 +314,11 @@ const CompaniesPage: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="text-left px-4 py-3">ID</th>
-              <th className="text-left px-4 py-3">Ad</th>
-              <th className="text-left px-4 py-3">E-posta</th>
-              <th className="text-left px-4 py-3">Telefon</th>
-              <th className="text-left px-4 py-3">Durum</th>
-              <th className="text-right px-4 py-3">İşlemler</th>
+              <th className="text-left px-4 py-3">{t('CompanyName')}</th>
+              <th className="text-left px-4 py-3">{t('Email')}</th>
+              <th className="text-left px-4 py-3">{t('Phone')}</th>
+              <th className="text-left px-4 py-3">{t('Status')}</th>
+              <th className="text-right px-4 py-3">{t('Actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -327,9 +330,9 @@ const CompaniesPage: React.FC = () => {
                 <td className="px-4 py-3">{c.telefon || '-'}</td>
                 <td className="px-4 py-3">
                   {c.aktiflik_durumu ? (
-                    <span className="inline-block rounded-full bg-green-100 text-green-700 px-2 py-0.5">Aktif</span>
+                    <span className="inline-block rounded-full bg-green-100 text-green-700 px-2 py-0.5">{t('Active')}</span>
                   ) : (
-                    <span className="inline-block rounded-full bg-red-100 text-red-700 px-2 py-0.5">Pasif</span>
+                    <span className="inline-block rounded-full bg-red-100 text-red-700 px-2 py-0.5">{t('Passive')}</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
@@ -338,13 +341,13 @@ const CompaniesPage: React.FC = () => {
                       onClick={() => openDetail(c.id)}
                       className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 bg-gray-100 hover:bg-gray-200"
                     >
-                      <Eye className="w-4 h-4" /> Görüntüle
+                      <Eye className="w-4 h-4" /> {t('Details')}
                     </button>
                     <button
                       onClick={() => openEdit(c)}
                       className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100"
                     >
-                      <Edit className="w-4 h-4" /> Düzenle
+                      <Edit className="w-4 h-4" /> {t('Edit')}
                     </button>
                   </div>
                 </td>
@@ -353,7 +356,7 @@ const CompaniesPage: React.FC = () => {
             {rows.length === 0 && !loading && (
               <tr>
                 <td colSpan={6} className="px-4 py-6 text-center text-gray-500">
-                  Kayıt bulunamadı
+                  {t('NoInfluencers')}
                 </td>
               </tr>
             )}

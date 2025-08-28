@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, Filter, Plus, Eye, MoreHorizontal, Loader2 } from 'lucide-react';
 import { getCampaigns, Campaign, mlinkGetCampaigns } from '../services/api';
-import { useI18n } from '../contexts/I18nContext';
+import { useLang, translations } from '../contexts/LangContext';
 import { apiClient } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -25,7 +25,8 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-  const { t, lang, setLang } = useI18n();
+  const { lang, setLang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
   const { user } = useAuth() as any;
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -143,21 +144,14 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
-          
           {user?.role === 'admin' && (
-          <button onClick={openCreate} className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors">
-            <Plus className="h-4 w-4 mr-2" /> New Campaign
-          </button>
-        )}
+            <button onClick={openCreate} className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors">
+              <Plus className="h-4 w-4 mr-2" /> {t('NewCampaign')}
+            </button>
+          )}
           <div className="mb-4 flex justify-end">
-          <button
-            onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
-            className="px-3 py-1 border rounded text-sm"
-          >
-            {lang === 'en' ? 'Türkçe' : 'English'}
-          </button>
-        </div>
 
+          </div>
         </div>
       </div>
 
@@ -183,10 +177,10 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="rounded-lg border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="ended">Ended</option>
+              <option value="all">{t('AllStatus')}</option>
+              <option value="active">{t('Active')}</option>
+              <option value="paused">{t('Paused')}</option>
+              <option value="ended">{t('Ended')}</option>
             </select>
             
             <div className="flex rounded-lg border border-gray-300">
@@ -196,7 +190,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                   viewMode === 'grid' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Grid
+                {t('Grid')}
               </button>
               <button
                 onClick={() => setViewMode('table')}
@@ -204,7 +198,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                   viewMode === 'table' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Table
+                {t('Table')}
               </button>
             </div>
           </div>
@@ -234,7 +228,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
             onClick={fetchCampaigns}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Ara
+            {t('Search')}
           </button>
         </div>
       {/* Campaigns List */}
@@ -259,24 +253,24 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <span className="text-gray-500 text-sm">Marka Komisyon:</span>
+                  <span className="text-gray-500 text-sm">{t('BrandCommission')}:</span>
                   <div className="text-purple-700 font-semibold">{selectedCampaign.brandCommissionRate}%</div>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-sm">Influencer Komisyon:</span>
+                  <span className="text-gray-500 text-sm">{t('InfluencerCommission')}:</span>
                   <div className="text-green-600 font-semibold">{selectedCampaign.influencerCommissionRate}%</div>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-sm">Diğer Masraflar:</span>
+                  <span className="text-gray-500 text-sm">{t('OtherCosts')}:</span>
                   <div className="font-semibold">{selectedCampaign.otherCostsRate}%</div>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-sm">Bitiş Tarihi:</span>
+                  <span className="text-gray-500 text-sm">{t('EndDate')}:</span>
                   <div className="font-semibold">{selectedCampaign.endDate}</div>
                 </div>
               </div>
 
-              <h3 className="text-md font-semibold mb-2 text-gray-700">Ürünler</h3>
+              <h3 className="text-md font-semibold mb-2 text-gray-700">{t('Products')}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {selectedCampaign.products.map((product, idx) => (
                   <div key={idx} className="border rounded-lg overflow-hidden">
@@ -318,15 +312,15 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                 
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Marka Komisyon Oranı:</span>
+                    <span className="text-gray-500">{t('BrandCommissionRate')}:</span>
                     <span className="font-medium text-purple-600">{campaign.brandCommissionRate}%</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Influencer Komisyon Oranı:</span>
+                    <span className="text-gray-500">{t('InfluencerCommissionRate')}:</span>
                     <span className="font-medium text-green-600">{campaign.influencerCommissionRate}%</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Diğer Masraf Oranları:</span>
+                    <span className="text-gray-500">{t('OtherCostsRate')}:</span>
                     <span className="font-medium">{campaign.otherCostsRate}%</span>
                   </div>
                 </div>
@@ -336,7 +330,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                   className="w-full inline-flex items-center justify-center px-4 py-2 border border-purple-300 rounded-lg text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  View Details
+                  {t('ViewDetails')}
                 </button>
               </div>
             </div>
@@ -348,22 +342,22 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Campaign
+                  {t('Campaign')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('Status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Commission
+                  {t('Commission')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Performance
+                  {t('Performance')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Revenue
+                  {t('Revenue')}
                 </th>
                 <th className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">{t('Actions')}</span>
                 </th>
               </tr>
             </thead>
@@ -415,13 +409,13 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl rounded-2xl bg-white shadow-lg">
             <div className="flex items-center justify-between border-b px-5 py-4">
-              <h2 className="text-lg font-semibold">Create Campaign</h2>
+              <h2 className="text-lg font-semibold">{t('CreateCampaign')}</h2>
               <button onClick={() => setCreateOpen(false)} className="p-2 hover:bg-gray-100 rounded-xl">✕</button>
             </div>
 
             <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex flex-col gap-1">
-                <span className="text-sm">Name *</span>
+                <span className="text-sm">{t('Name')} *</span>
                 <input
                   value={createForm.name}
                   onChange={(e) => setCreateForm(f => ({ ...f, name: e.target.value }))}
@@ -430,17 +424,17 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm">Company *</span>
+                <span className="text-sm">{t('Company')} *</span>
                 <CompanySelect
                   items={companies} // [{ id, name }]
                   value={createForm.company_id ? Number(createForm.company_id) : null}
                   onChange={(id) => setCreateForm(f => ({ ...f, company_id: id ? String(id) : '' }))}
-                  placeholder="Search company name"
+                  placeholder={t('SearchCompanyName')}
                 />
               </label>
 
               <label className="flex flex-col gap-1 md:col-span-2">
-                <span className="text-sm">Brief</span>
+                <span className="text-sm">{t('Brief')}</span>
                 <textarea
                   rows={3}
                   value={createForm.brief}
@@ -450,7 +444,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm">Branding Image URL</span>
+                <span className="text-sm">{t('BrandingImageURL')}</span>
                 <input
                   value={createForm.brandingImage}
                   onChange={(e) => setCreateForm(f => ({ ...f, brandingImage: e.target.value }))}
@@ -459,7 +453,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm">End Date *</span>
+                <span className="text-sm">{t('EndDate')} *</span>
                 <input
                   type="date"
                   value={createForm.endDate}
@@ -469,7 +463,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm">Brand Commission Rate (%)</span>
+                <span className="text-sm">{t('BrandCommissionRate')} (%)</span>
                 <input
                   type="number"
                   step="0.01"
@@ -481,7 +475,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm">Influencer Commission Rate (%)</span>
+                <span className="text-sm">{t('InfluencerCommissionRate')} (%)</span>
                 <input
                   type="number"
                   step="0.01"
@@ -493,7 +487,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm">Other Costs Rate (%)</span>
+                <span className="text-sm">{t('OtherCostsRate')} (%)</span>
                 <input
                   type="number"
                   step="0.01"
@@ -510,14 +504,14 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                 onClick={() => setCreateOpen(false)}
                 className="rounded-xl px-4 py-2 bg-gray-100 hover:bg-gray-200"
               >
-                Cancel
+                {t('Cancel')}
               </button>
               <button
                 onClick={submitCreate}
                 disabled={creating}
                 className="inline-flex items-center gap-2 rounded-xl px-4 py-2 bg-purple-600 text-white hover:opacity-90 disabled:opacity-60"
               >
-                {creating ? 'Creating…' : 'Create'}
+                {creating ? t('Creating') + '…' : t('Create')}
               </button>
             </div>
           </div>
@@ -617,7 +611,7 @@ function CompanySelect({
       {open && (
         <div className="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow max-h-60 overflow-auto">
           {filtered.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-gray-500">No results</div>
+            <div className="px-3 py-2 text-sm text-gray-500">{t('NoResults')}</div>
           ) : (
             filtered.map((i) => (
               <button
@@ -638,3 +632,4 @@ function CompanySelect({
     </div>
   );
 }
+

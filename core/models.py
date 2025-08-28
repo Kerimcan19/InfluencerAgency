@@ -77,7 +77,7 @@ class Campaign(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     createdAt = Column(DateTime, default=datetime.utcnow)
-    userId = Column(Integer, ForeignKey('users.id'), nullable=True, index=True)  # kept for compatibility (not used for influencer relation now)
+    userId = Column(Integer, ForeignKey('users.id'), nullable=True, index=True) 
     company_id = Column(Integer, ForeignKey('companies.id'), nullable=True)
 
     name = Column(String, nullable=False)

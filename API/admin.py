@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session, selectinload
 from database import get_db, frontend_url
 from core.models import Company, User, Campaign, ActivityLog, Influencer, Product
-from core.schemas import CompanyCreate, CompanyOut, CompanyListResponse, UserCreate, CampaignCreate, InfluencerCreate, CompanyBase
+from core.schemas import InfluencerOut, CompanyCreate, CompanyOut, CompanyListResponse, UserCreate, CampaignCreate, InfluencerCreate, CompanyBase
 from usecases.auth_use import get_current_user
 from typing import Optional
 from datetime import datetime
 from usecases.auth_use import hash_password, create_access_token
 import logging
 import secrets, os, smtplib
-from usecases.utils import send_password_reset_email
+from usecases.utils import send_password_reset_email    
 from typing import Dict, Any, List
 
 router = APIRouter()
@@ -484,4 +484,26 @@ def import_mlink_campaigns(
         "message": f"Imported/updated {imported} campaign(s).",
         "type": 0,
         "data": {"count": imported}
+    }
+
+@router.get("/list-influencers/{campaign_id}")
+def list_influencers(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    user = db.query(User).filter(User.id == current_user["sub"]).first()
+    if not user or user.role not in ["admin", "company"]:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    influencers = campaign.influencers  # uses the many-to-many relationship
+    return {
+        "isSuccess": True,
+        "message": None,
+        "type": 0,
+        "data": [InfluencerOut.model_validate(i, from_attributes=True) for i in influencers]
     }

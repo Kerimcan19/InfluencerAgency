@@ -4,6 +4,7 @@ import { PerformanceChart } from '../components/PerformanceChart';
 import { StatsCard } from '../components/StatsCard';
 import { getDashboardActivity, getDashboardSummary, DashboardSummaryResponse, Report, getReports, ActivityOut } from '../services/api';
 import type { ChartPoint } from '../components/PerformanceChart';
+import { useLang, translations } from '../contexts/LangContext';
 
 interface DashboardPageProps {
   onAddToast: (message: string, type: 'success' | 'error' | 'warning') => void;
@@ -24,13 +25,16 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [chartTotals, setChartTotals] = useState({ sales: 0, clicks: 0, conv: 0 });
   const [selectedRange, setSelectedRange] = useState("Last 30 days");
-  const rangeToDays = (label: string) =>
-  label.includes("7") ? 7 : label.includes("90") ? 90 : 30;
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
 
-const fmt = (d: Date) =>
-  String(d.getDate()).padStart(2, '0') + '.' +
-  String(d.getMonth() + 1).padStart(2, '0') + '.' +
-  d.getFullYear();
+  const rangeToDays = (label: string) =>
+    label.includes("7") ? 7 : label.includes("90") ? 90 : 30;
+
+  const fmt = (d: Date) =>
+    String(d.getDate()).padStart(2, '0') + '.' +
+    String(d.getMonth() + 1).padStart(2, '0') + '.' +
+    d.getFullYear();
 
   const buildChartForRange = async (days: number) => {
     const end = new Date();
@@ -74,17 +78,17 @@ const fmt = (d: Date) =>
     setChartTotals({ sales: totalSalesSum, clicks: totalClicksSum, conv: conversionRate });
   };
   const fetchDashboardData = async () => {
-  try {
-    const [summary, activity] = await Promise.all([
-      getDashboardSummary(),
-      getDashboardActivity(),
-    ]);
-    setStats(summary);
-    setRecentActivity(activity);
-  } catch (e) {
-    onAddToast('Failed to load dashboard data', 'error');
-  }
-};
+    try {
+      const [summary, activity] = await Promise.all([
+        getDashboardSummary(),
+        getDashboardActivity(),
+      ]);
+      setStats(summary);
+      setRecentActivity(activity);
+    } catch (e) {
+      onAddToast('Failed to load dashboard data', 'error');
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -94,7 +98,7 @@ const fmt = (d: Date) =>
       setIsLoading(false);
     };
     loadData();
-  }, []); // keep empty; initial mount
+  }, []); // keep empty; initial mount  
 
 
   useEffect(() => {
@@ -104,16 +108,18 @@ const fmt = (d: Date) =>
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    setIsLoading(true);
     await Promise.all([
       fetchDashboardData(),
       buildChartForRange(rangeToDays(selectedRange)),
     ]);
     setIsRefreshing(false);
-    onAddToast('Dashboard data refreshed successfully', 'success');
+    setIsLoading(false);
   };
 
   const handleQuickLink = () => {
-    onAddToast('Redirecting to link generator...', 'success');
+    onAddToast(t('RedirectingToLinkGenerator'), 'success');
+    window.location.assign("/generate-link");
   };
 
   if (isLoading) {
@@ -147,9 +153,9 @@ const fmt = (d: Date) =>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('DashboardOverview')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Track your affiliate marketing performance and campaign metrics
+            {t('DashboardDesc')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
@@ -159,15 +165,9 @@ const fmt = (d: Date) =>
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('Refresh')}
           </button>
-          <button
-            onClick={handleQuickLink}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors"
-          >
-            <Link2 className="h-4 w-4 mr-2" />
-            Quick Link
-          </button>
+
         </div>
       </div>
 
@@ -175,28 +175,28 @@ const fmt = (d: Date) =>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats && [
           {
-            title: 'Active Campaigns',
+            title: t('ActiveCampaigns'),
             value: stats.activeCampaigns.toString(),
             change: '',
             icon: TrendingUp,
             color: 'text-teal-600 bg-teal-50',
           },
           {
-            title: 'Total Clicks',
+            title: t('TotalClicks'),
             value: stats.totalClicks.toLocaleString(),
             change: '',
             icon: MousePointer,
             color: 'text-purple-600 bg-purple-50',
           },
           {
-            title: 'Total Sales',
+            title: t('TotalSales'),
             value: `${stats.totalSales.toLocaleString()}`,
             change: '',
             icon: DollarSign,
             color: 'text-blue-600 bg-blue-50',
           },
           {
-            title: 'Total Company Commission',
+            title: t('TotalCompanyCommission'),
             value: `$${stats.totalCommission.toLocaleString()}`,
             change: '',
             icon: DollarSign,
@@ -213,20 +213,20 @@ const fmt = (d: Date) =>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Sales Performance</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('SalesPerformance')}</h3>
               <p className="text-sm text-gray-500">
-                {selectedRange} performance overview
+                {t('Last30Days')} {t('PerformanceOverview')}
               </p>
             </div>
             <select
-            value={selectedRange}
-            onChange={(e) => setSelectedRange(e.target.value)}
-            className="rounded-lg border-gray-300 text-sm"
-          >
-            <option>Last 30 days</option>
-            <option>Last 7 days</option>
-            <option>Last 90 days</option>
-          </select>
+              value={selectedRange}
+              onChange={(e) => setSelectedRange(e.target.value)}
+              className="rounded-lg border-gray-300 text-sm"
+            >
+              <option>{t('Last30Days')}</option>
+              <option>{t('Last7Days')}</option>
+              <option>{t('Last90Days')}</option>
+            </select>
           </div>
           <PerformanceChart data={chartData} totals={chartTotals} />
         </div>
@@ -235,27 +235,26 @@ const fmt = (d: Date) =>
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('RecentActivity')}</h3>
           <div className="space-y-4">
-              {recentActivity.map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{activity.label}</p>
-                      <p className="text-xs text-gray-500">{activity.type}</p>
-                    </div>
+            {recentActivity.map((activity, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{activity.label}</p>
+                    <p className="text-xs text-gray-500">{activity.type}</p>
                   </div>
-                  <span className="text-xs text-gray-400">
-                    {new Date(activity.timestamp).toLocaleString()}
-                  </span>
                 </div>
-              ))}
-            </div>
-
+                <span className="text-xs text-gray-400">
+                  {new Date(activity.timestamp).toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

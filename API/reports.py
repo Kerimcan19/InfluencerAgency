@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session, selectinload
+from API import user
 from database import get_db
 from core.models import Report, Campaign, User, Influencer, ActivityLog
 from core.schemas import ReportCreate, ReportOut, ReportListResponse
@@ -84,6 +85,22 @@ def get_report(
 ):
     # Fetch the full user from DB to access company_id
     user = db.query(User).filter(User.id == current_user["sub"]).first()
+
+    if user.role == "influencer":
+        influencer = db.query(Influencer).filter(Influencer.user_id == user.id).first()
+        if not influencer:
+            raise HTTPException(status_code=404, detail="Influencer profile not found")
+        reports = db.query(Report).filter(Report.influencer_id == influencer.id).all()
+        return {
+            "data": [ReportOut.model_validate(r, from_attributes=True) for r in reports],
+            "isSuccess": True,
+            "message": None,
+            "type": 0,
+            "activeInfluencers": 1 if reports else 0,
+            "totalInfluencerCommission": sum(
+                (r.influencerCommissionAmount or Decimal("0.00")) for r in reports
+            ),
+        }
 
     if not user or user.role not in ["company", "admin"]:
         raise HTTPException(status_code=403, detail="Access denied")

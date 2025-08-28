@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session, selectinload
 from database import get_db, frontend_url
-from core.models import Campaign, Report, User, TrackingLink, ActivityLog
+from core.models import Campaign, Report, User, TrackingLink, ActivityLog, Influencer
 from core.schemas import CampaignListResponse, CampaignOut, ReportOut, ReportListResponse, GenerateLinkRequest, GenerateLinkResponse, GeneratedLinkData
 from core.schemas import ResetPasswordRequest
 from usecases.auth_use import get_current_user, create_link_token, decode_access_token, hash_password
@@ -28,9 +28,36 @@ def get_campaigns(
 ):
     
     user = db.query(User).filter(User.id == current_user["sub"]).first()
-    if not user or user.role not in ["company", "admin"]:
+    if not user or user.role not in ["company", "admin", "influencer"]:
         raise HTTPException(status_code=403, detail= "Access denied")
-
+    
+    if user.role == "influencer":
+        influencer = db.query(Influencer).filter(Influencer.user_id == user.id).first()
+        if not influencer:
+            return {"data": [], "isSuccess": False, "message": "Influencer profile not found", "type": 1}
+        campaigns = influencer.campaigns
+        # Apply filters if needed
+        if Name:
+            campaigns = [c for c in campaigns if Name.lower() in c.name.lower()]
+        if StartDate:
+            try:
+                start_dt = datetime.strptime(StartDate, "%d.%m.%Y")
+                campaigns = [c for c in campaigns if c.endDate >= start_dt]
+            except ValueError:
+                return {"data": [], "isSuccess": False, "message": "Invalid StartDate", "type": 1}
+        if EndDate:
+            try:
+                end_dt = datetime.strptime(EndDate, "%d.%m.%Y")
+                campaigns = [c for c in campaigns if c.endDate <= end_dt]
+            except ValueError:
+                return {"data": [], "isSuccess": False, "message": "Invalid EndDate", "type": 1}
+        return {
+            "data": [CampaignOut.model_validate(c, from_attributes=True) for c in campaigns],
+            "isSuccess": True,
+            "message": None,
+            "type": 0
+        }
+    
     query = db.query(Campaign)
 
     # Admin can optionally filter by any company_id

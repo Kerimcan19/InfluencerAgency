@@ -12,7 +12,7 @@ async def mlink_campaigns(
     end_date: Optional[str] = Query(None, alias="EndDate"),
     user=Depends(get_current_user),  
 ):
-    if user["role"] not in ["company", "admin"]:
+    if user["role"] not in ["company", "admin", "influencer"]:
         raise HTTPException(status_code=403, detail= "Access denied")
     
     params = {}

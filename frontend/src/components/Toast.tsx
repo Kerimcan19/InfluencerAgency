@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
+import { useLang, translations } from '../contexts/LangContext';
 
 export interface ToastMessage {
   id: string;
@@ -44,6 +45,8 @@ function ToastItem({ toast, onRemove }: { toast: ToastMessage; onRemove: (id: st
   };
 
   const Icon = icons[toast.type];
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
 
   return (
     <div className={`
@@ -52,7 +55,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastMessage; onRemove: (id: st
       animate-in slide-in-from-right-full duration-300
     `}>
       <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-      <p className="text-sm font-medium flex-1">{toast.message}</p>
+      <p className="text-sm font-medium flex-1">{t(toast.message)}</p>
       <button
         onClick={() => onRemove(toast.id)}
         className="ml-3 text-gray-400 hover:text-gray-600 transition-colors"

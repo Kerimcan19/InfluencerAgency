@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Download, Filter, TrendingUp, Users, MousePointer } from 'lucide-react';
 import { ReportsResponse, Report, mlinkGetReports } from '../services/api';
 import { apiClient } from '../services/api';
+import { useLang, translations } from '../contexts/LangContext';
 
 interface ReportsPageProps {
   onAddToast: (message: string, type: 'success' | 'error' | 'warning') => void;
 }
-
 
 export function ReportsPage({ onAddToast }: ReportsPageProps) {
   const [dateRange, setDateRange] = useState('30days');
@@ -17,6 +17,8 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
   const [reportsResponse, setReportsResponse] = useState<ReportsResponse | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
 
   function getDateRangeParams(range: string) {
       const today = new Date();
@@ -110,15 +112,14 @@ const handleExportCSV = async () => {
 
 
 
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Performance Reports</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('PerformanceReports')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Analyze influencer performance and track commission breakdowns
+            {t('AnalyzePerformance')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -127,7 +128,7 @@ const handleExportCSV = async () => {
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 transition-colors"
           >
             <Download className="h-4 w-4 mr-2" />
-            Export CSV
+            {t('ExportCSV')}
           </button>
         </div>
       </div>
@@ -137,32 +138,32 @@ const handleExportCSV = async () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Date Range
+              {t('DateRange')}
             </label>
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
             >
-              <option value="7days">Last 7 days</option>
-              <option value="30days">Last 30 days</option>
-              <option value="90days">Last 90 days</option>
-              <option value="custom">Custom range</option>
+              <option value="7days">{t('Last7Days')}</option>
+              <option value="30days">{t('Last30Days')}</option>
+              <option value="90days">{t('Last90Days')}</option>
+              <option value="custom">{t('CustomRange')}</option>
             </select>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Influencer
+              {t('Influencer')}
             </label>
             <select
               value={selectedInfluencer}
               onChange={(e) => setSelectedInfluencer(e.target.value)}
               className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
             >
-              <option value="all">All Influencers</option>
+              <option value="all">{t('AllInfluencers')}</option>
               {loading ? (
-                <option disabled>Yükleniyor...</option>
+                <option disabled>{t('Loading')}...</option>
                 ) : (
                   influencers.map((report: any) => (
                     <option key={report.influencer_id} value={report.influencer_id}>
@@ -180,7 +181,7 @@ const handleExportCSV = async () => {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
               <Filter className="h-4 w-4 mr-2" />
-              Apply Filters
+              {t('ApplyFilters')}
             </button>
           </div>
         </div>
@@ -194,7 +195,7 @@ const handleExportCSV = async () => {
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Influencers</p>
+              <p className="text-sm font-medium text-gray-600">{t('ActiveInfluencers')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {reportsResponse?.activeInfluencers ?? 0}
               </p>
@@ -208,7 +209,7 @@ const handleExportCSV = async () => {
               <TrendingUp className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Influencer Commission</p>
+              <p className="text-sm font-medium text-gray-600">{t('TotalInfluencerCommission')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 ₺{Number(reportsResponse?.totalInfluencerCommission ?? 0).toLocaleString()}
               </p>
@@ -221,8 +222,8 @@ const handleExportCSV = async () => {
       {/* Performance Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Influencer Reports</h3>
-          <p className="text-sm text-gray-500">Detailed list of influencer reports</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('InfluencerReports')}</h3>
+          <p className="text-sm text-gray-500">{t('DetailedListOfInfluencerReports')}</p>
         </div>
         
         <div className="overflow-x-auto">
@@ -239,13 +240,13 @@ const handleExportCSV = async () => {
             </colgroup>
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">Influencer</th>
-                <th className="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">Campaign</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Clicks</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sales</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Conv. Rate</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Influencer Commission</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">{t('Influencer')}</th>
+                <th className="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">{t('Campaign')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('Clicks')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('Sales')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('ConvRate')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('InfluencerCommission')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('Actions')}</th>
               </tr>
             </thead>
 
@@ -314,7 +315,7 @@ const handleExportCSV = async () => {
                         onClick={() => { setSelectedReport(r); setDetailsOpen(true); }}
                         className="px-3 py-1.5 rounded-full text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-medium"
                       >
-                        Details
+                        {t('Details')}
                       </button>
                     </td>
                   </tr>
@@ -354,7 +355,7 @@ const handleExportCSV = async () => {
                     onClick={() => setDetailsOpen(false)}
                     className="px-3.5 py-2 rounded-lg text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"
                   >
-                    Close
+                    {t('Close')}
                   </button>
                 </div>
 
@@ -363,19 +364,19 @@ const handleExportCSV = async () => {
                   {/* quick stats */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="rounded-xl border border-gray-300 bg-white shadow-sm px-5 py-4 text-center">
-                      <div className="text-sm font-semibold text-gray-600">Clicks</div>
+                      <div className="text-sm font-semibold text-gray-600">{t('Clicks')}</div>
                       <div className="mt-2 text-2xl font-bold text-gray-900 tabular-nums">
                         {Number(selectedReport.totalClicks ?? 0).toLocaleString()}
                       </div>
                     </div>
                     <div className="rounded-xl border border-gray-300 bg-white shadow-sm px-5 py-4 text-center">
-                      <div className="text-sm font-semibold text-gray-600">Sales</div>
+                      <div className="text-sm font-semibold text-gray-600">{t('Sales')}</div>
                       <div className="mt-2 text-2xl font-bold text-gray-900 tabular-nums">
                         {Number(selectedReport.totalSales ?? 0).toLocaleString()}
                       </div>
                     </div>
                     <div className="rounded-xl border border-gray-300 bg-white shadow-sm px-5 py-4 text-center">
-                      <div className="text-sm font-semibold text-gray-600">Conv. Rate</div>
+                      <div className="text-sm font-semibold text-gray-600">{t('ConvRate')}</div>
                       <div className="mt-2 text-2xl font-bold text-purple-700">
                         {(
                           Number(selectedReport.totalClicks) > 0
@@ -385,7 +386,7 @@ const handleExportCSV = async () => {
                       </div>
                     </div>
                     <div className="rounded-xl border border-gray-300 bg-white shadow-sm px-5 py-4 text-center">
-                      <div className="text-sm font-semibold text-gray-600">Commission</div>
+                      <div className="text-sm font-semibold text-gray-600">{t('Commission')}</div>
                       <div className="mt-2 text-2xl font-bold text-green-700 tabular-nums">
                         ₺{Number(selectedReport.influencerCommissionAmount ?? 0).toLocaleString()}
                       </div>
@@ -397,29 +398,29 @@ const handleExportCSV = async () => {
                     {/* commission breakdown */}
                     <div className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
                       <div className="text-center text-base font-bold text-gray-800 mb-4">
-                        Commission Breakdown
+                        {t('CommissionBreakdown')}
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Brand</span>
+                          <span className="text-gray-600">{t('Brand')}</span>
                           <span className="tabular-nums">
                             ₺{Number(selectedReport.brandCommissionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Influencer</span>
+                          <span className="text-gray-600">{t('Influencer')}</span>
                           <span className="tabular-nums">
                             ₺{Number(selectedReport.influencerCommissionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Mimeda</span>
+                          <span className="text-gray-600">{t('Mimeda')}</span>
                           <span className="tabular-nums">
                             ₺{Number(selectedReport.mimedaCommissionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Agency</span>
+                          <span className="text-gray-600">{t('Agency')}</span>
                           <span className="tabular-nums">
                             ₺{Number(selectedReport.agencyCommissionAmount ?? 0).toLocaleString()}
                           </span>
@@ -430,27 +431,27 @@ const handleExportCSV = async () => {
                     {/* rates */}
                     <div className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
                       <div className="text-center text-base font-bold text-gray-800 mb-4">
-                        Rates
+                        {t('Rates')}
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Brand</span>
+                          <span className="text-gray-600">{t('Brand')}</span>
                           <span className="tabular-nums">{Number(selectedReport.brandCommissionRate ?? 0)}%</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Influencer</span>
+                          <span className="text-gray-600">{t('Influencer')}</span>
                           <span className="tabular-nums">{Number(selectedReport.influencerCommissionRate ?? 0)}%</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Other</span>
+                          <span className="text-gray-600">{t('Other')}</span>
                           <span className="tabular-nums">{Number(selectedReport.otherCostsRate ?? 0)}%</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Mimeda</span>
+                          <span className="text-gray-600">{t('Mimeda')}</span>
                           <span className="tabular-nums">{Number(selectedReport.mimedaCommissionRate ?? 0)}%</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Agency</span>
+                          <span className="text-gray-600">{t('Agency')}</span>
                           <span className="tabular-nums">{Number(selectedReport.agencyCommissionRate ?? 0)}%</span>
                         </div>
                       </div>
@@ -463,7 +464,7 @@ const handleExportCSV = async () => {
                   <div className="text-center">
                     <span className="text-sm font-medium text-gray-700 underline">
                       {selectedReport.createdAt
-                        ? `Report created on ${new Date(selectedReport.createdAt).toLocaleDateString("tr-TR")}`
+                        ? `${t('ReportCreatedOn')} ${new Date(selectedReport.createdAt).toLocaleDateString("tr-TR")}`
                         : "-"}
                     </span>
                   </div>
@@ -480,12 +481,12 @@ const handleExportCSV = async () => {
       {/* Performance Insights */}
       {/* Performance Insights */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Insights</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('PerformanceInsights')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Top Performers */}
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Top Performers</h4>
+              <h4 className="font-medium text-gray-900">{t('TopPerformers')}</h4>
               {[...influencers]
                 .filter(i => i.totalClicks > 0)
                 .sort((a, b) => (b.totalSales / b.totalClicks) - (a.totalSales / a.totalClicks))
@@ -510,7 +511,7 @@ const handleExportCSV = async () => {
 
             {/* Revenue Leaders */}
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Revenue Leaders</h4>
+              <h4 className="font-medium text-gray-900">{t('RevenueLeaders')}</h4>
               {[...influencers]
                 .sort((a, b) => b.influencerCommissionAmount - a.influencerCommissionAmount)
                 .slice(0, 3)

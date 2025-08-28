@@ -42,6 +42,9 @@ class InfluencerBase(BaseModel):
 class InfluencerOut(InfluencerBase):
     id: int
 
+    class Config:
+        from_attributes = True
+
 class TokenData(BaseModel):
     accessToken: str
     expiration: Optional[datetime] = None

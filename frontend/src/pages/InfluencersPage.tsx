@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../services/api';
 import { Search, Edit, Eye, X, Save, RefreshCw, Shield, PlusCircle } from 'lucide-react';
+import { useLang, translations } from '../contexts/LangContext';
 
 type Influencer = {
   id: number;
@@ -35,9 +36,11 @@ type InfluencerCreatePayload = {
 
 const InfluencersPage: React.FC = () => {
   const { user } = useAuth() as any;
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
 
   // admin-only UI guard
-  if (!user || user.role !== 'admin') return null;
+  if (!user || user.user.role !== 'admin') return null;
 
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState<Influencer[]>([]);
@@ -233,19 +236,19 @@ const InfluencersPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Influencerlar</h1>
+        <h1 className="text-2xl font-semibold">{t('Influencers')}</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenCreate}
             className="inline-flex items-center gap-2 rounded-xl px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
           >
-            <PlusCircle className="w-4 h-4" /> Yeni Influencer
+            <PlusCircle className="w-4 h-4" /> {t('NewInfluencer')}
           </button>
           <button
             onClick={fetchList}
             className="inline-flex items-center gap-2 rounded-xl px-3 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100"
           >
-            <RefreshCw className="w-4 h-4" /> Yenile
+            <RefreshCw className="w-4 h-4" /> {t('Refresh')}
           </button>
         </div>
       </div>
@@ -254,7 +257,7 @@ const InfluencersPage: React.FC = () => {
       <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <FilterInput
           icon={<Search className="w-4 h-4 text-gray-500" />}
-          placeholder="Kullanıcı adı ile ara"
+          placeholder={t('FilterByUsername')}
           value={filters.name}
           onChange={(v) => setFilters((f) => ({ ...f, name: v }))}
         />
@@ -266,7 +269,7 @@ const InfluencersPage: React.FC = () => {
           disabled={loading}
           className="rounded-xl bg-black text-white px-4 py-2 hover:opacity-90 disabled:opacity-60"
         >
-          {loading ? 'Yükleniyor…' : 'Filtrele'}
+          {loading ? t('loading') : t('Filter')}
         </button>
       </div>
 

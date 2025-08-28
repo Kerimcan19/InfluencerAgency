@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLang, translations } from '../contexts/LangContext';
 
 export interface ChartPoint {
   day: string;     // e.g., 'Mon', 'Tue', or '2025-08-08'
@@ -13,17 +14,18 @@ export function PerformanceChart({
   data: ChartPoint[];
   totals?: { sales: number; clicks: number; conv: number };
 }) {
+  const { lang } = useLang();
+  const t = (key: string) => translations[lang][key] || key;
   const maxSales = data.length ? Math.max(...data.map(d => d.sales)) : 0;
   const maxClicks = data.length ? Math.max(...data.map(d => d.clicks)) : 0;
 
   if (!data.length) {
     return (
       <div className="text-sm text-gray-500 py-8 text-center">
-        No data for the selected period
+        {t('NoData')}
       </div>
     );
   }
-
 
   return (
     <div className="space-y-4">
@@ -31,11 +33,11 @@ export function PerformanceChart({
       <div className="flex items-center justify-center space-x-6 text-sm">
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-          <span className="text-gray-600">Sales ($)</span>
+          <span className="text-gray-600">{t('Sales')} ($)</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
-          <span className="text-gray-600">Clicks</span>
+          <span className="text-gray-600">{t('Clicks')}</span>
         </div>
       </div>
 
@@ -79,19 +81,19 @@ export function PerformanceChart({
             <p className="text-2xl font-bold text-purple-600">
               {totals.sales.toLocaleString()}
             </p>
-            <p className="text-sm text-gray-500">Total Sales</p>
+            <p className="text-sm text-gray-500">{t('TotalSales')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-teal-600">
               {totals.clicks.toLocaleString()}
             </p>
-            <p className="text-sm text-gray-500">Total Clicks</p>
+            <p className="text-sm text-gray-500">{t('TotalClicks')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-800">
               {totals.conv}%
             </p>
-            <p className="text-sm text-gray-500">Conv. Rate</p>
+            <p className="text-sm text-gray-500">{t('ConvRate')}</p>
           </div>
         </div>
       )}
