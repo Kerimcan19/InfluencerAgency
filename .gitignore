@@ -24,3 +24,5 @@ venv
 .venv
 env
 .env
+.github
+.github/

@@ -3,6 +3,7 @@ import { Download, Filter, TrendingUp, Users, MousePointer } from 'lucide-react'
 import { ReportsResponse, Report, mlinkGetReports } from '../services/api';
 import { apiClient } from '../services/api';
 import { useLang, translations } from '../contexts/LangContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ReportsPageProps {
   onAddToast: (message: string, type: 'success' | 'error' | 'warning') => void;
@@ -18,6 +19,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const { lang } = useLang();
+  const { user } = useAuth(); // Use useAuth for user/role
   const t = (key: string) => translations[lang][key] || key;
 
   function getDateRangeParams(range: string) {
@@ -111,6 +113,28 @@ const handleExportCSV = async () => {
 };
 
 
+
+  // Aggregate influencer stats (sum per influencer, not per report)
+  const influencerAggregates = React.useMemo(() => {
+    const map = new Map<string, any>();
+    for (const r of influencers) {
+      const key = r.influencer_id;
+      if (!map.has(key)) {
+        map.set(key, {
+          influencer_id: r.influencer_id,
+          influencerName: r.influencerName,
+          totalClicks: 0,
+          totalSales: 0,
+          influencerCommissionAmount: 0,
+        });
+      }
+      const agg = map.get(key);
+      agg.totalClicks += Number(r.totalClicks) || 0;
+      agg.totalSales += Number(r.totalSales) || 0;
+      agg.influencerCommissionAmount += Number(r.influencerCommissionAmount) || 0;
+    }
+    return Array.from(map.values());
+  }, [influencers]);
 
   return (
     <div className="space-y-6">
@@ -479,7 +503,7 @@ const handleExportCSV = async () => {
       </div>
 
       {/* Performance Insights */}
-      {/* Performance Insights */}
+      {user?.user?.role === 'admin' && (
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('PerformanceInsights')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -487,12 +511,12 @@ const handleExportCSV = async () => {
             {/* Top Performers */}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">{t('TopPerformers')}</h4>
-              {[...influencers]
+              {[...influencerAggregates]
                 .filter(i => i.totalClicks > 0)
                 .sort((a, b) => (b.totalSales / b.totalClicks) - (a.totalSales / a.totalClicks))
                 .slice(0, 3)
                 .map((inf, index) => (
-                  <div key={inf.campaignID} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={inf.influencer_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                         index === 0 ? 'bg-yellow-500' :
@@ -512,11 +536,11 @@ const handleExportCSV = async () => {
             {/* Revenue Leaders */}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">{t('RevenueLeaders')}</h4>
-              {[...influencers]
+              {[...influencerAggregates]
                 .sort((a, b) => b.influencerCommissionAmount - a.influencerCommissionAmount)
                 .slice(0, 3)
                 .map((inf, index) => (
-                  <div key={inf.campaignID} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={inf.influencer_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                         index === 0 ? 'bg-green-500' :
@@ -527,15 +551,14 @@ const handleExportCSV = async () => {
                       <span className="text-sm font-medium">{inf.influencerName}</span>
                     </div>
                     <span className="text-sm text-green-600 font-medium">
-                      ₺{inf.influencerCommissionAmount}
+                      ₺{inf.influencerCommissionAmount.toLocaleString()}
                     </span>
                   </div>
                 ))}
             </div>
-
           </div>
         </div>
-
+      )}
     </div>
   );
 }
