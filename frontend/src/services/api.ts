@@ -68,7 +68,7 @@ export const getCampaigns = async (
   if (startDate) params.StartDate = startDate;
   if (endDate) params.EndDate = endDate;
 
-  const response = await apiClient.get<CampaignsResponse>('/Affiliate/GetCampaigns', { params });
+  const response = await apiClient.get<CampaignsResponse>('/mlink/campaigns', { params });
   return response.data;
 };
 
@@ -114,7 +114,7 @@ export const getReports = async (
   if (startDate) params.StartDate = startDate;
   if (endDate) params.EndDate = endDate;
 
-  const response = await apiClient.get<ReportsResponse>('/Affiliate/GetReport', { params });
+  const response = await apiClient.get<ReportsResponse>('/mlink/reports', { params });
   return response.data;
 };
 
@@ -143,7 +143,7 @@ export const generateTrackingLink = async (
   campaignID: number
 ): Promise<GenerateLinkResponse> => {
   const response = await apiClient.put<GenerateLinkResponse>(
-    '/Affiliate/GenerateLink',
+    '/mlink/generate-link',
     {
       influencerID,
       influencerName,

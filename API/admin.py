@@ -211,7 +211,7 @@ def list_influencers(
     influencers = query.order_by(Influencer.id).all()
 
     # return simple serializable objects (no schema change)
-    return [
+    data = [
         {
             "id": i.id,
             "username": i.username,
@@ -221,6 +221,12 @@ def list_influencers(
         }
         for i in influencers
     ]
+    return {
+        "isSuccess": True,
+        "message": None,
+        "type": 0,
+        "data": data
+    }
 
 @router.get("/admin/influencers/{influencer_id}", tags=["Admin"])
 def get_influencer_detail(

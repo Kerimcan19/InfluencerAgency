@@ -47,25 +47,18 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
     fetchCampaigns();
   }, []);
 
-  // Fetch influencers for the selected campaign
+  // Fetch all influencers once on mount (not filtered by campaign)
   useEffect(() => {
-    if (!selectedCampaign) {
-      setInfluencers([]);
-      setSelectedInfluencerId(null);
-      setInfluencerId('');
-      setInfluencerName('');
-      return;
-    }
     let mounted = true;
     (async () => {
       try {
-        const res = await apiClient.get(`/list-influencers/${selectedCampaign}`);
+        const res = await apiClient.get('/admin/list_influencers');
         if (mounted && res.data && res.data.isSuccess) {
           setInfluencers(res.data.data || []);
         } else if (mounted) {
           setInfluencers([]);
         }
-      } catch (err) {
+      } catch {
         if (mounted) {
           setInfluencers([]);
           onAddToast(t('FailedToLoadInfluencers'), 'error');
@@ -73,7 +66,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
       }
     })();
     return () => { mounted = false; };
-  }, [selectedCampaign, onAddToast, t]);
+  }, []); // Only run once on mount
 
   useEffect(() => {
     if (!selectedInfluencerId) {
@@ -410,4 +403,3 @@ function InfluencerSelect({
     </div>
   );
 }
-
