@@ -8,7 +8,8 @@ import {
   Menu, 
   X,
   TrendingUp, 
-  Building2
+  Building2,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLang, translations } from '../contexts/LangContext';
@@ -29,6 +30,7 @@ const navigation = [
   { name: 'GenerateLink', id: 'generate-link', icon: Link2 },
   { name: 'Companies', id: 'companies', icon: Building2, requiresAdmin: true },
   { name: 'Influencers', id: 'influencers', icon: TrendingUp, requiresAdmin: true },
+  { name: 'Settings', id: 'settings', icon: Settings },
 ];
 
 export function Sidebar({ currentPage, onPageChange, isOpen, onToggle, onLogout, allowedPages }: SidebarProps) {

@@ -116,13 +116,53 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
     return {"message": "Password reset successful"}
 
 @router.patch("/update-influencer-profile")
-def update_profile(request: InfluencerUpdate, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == request.user_id).first()
+def update_profile(
+    request: InfluencerUpdate, 
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # First verify current user is authorized to update this profile
+    user = db.query(User).filter(User.id == current_user["sub"]).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    user.name = request.name
-    user.email = request.email
+    
+    # Find influencer profile - either by user_id from token or specified in request
+    target_user_id = request.user_id or user.id
+    
+    # Only allow admins to update other users
+    if target_user_id != user.id and user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to update this profile")
+    
+    # Find the influencer record
+    influencer = db.query(Influencer).filter(Influencer.user_id == target_user_id).first()
+    if not influencer:
+        raise HTTPException(status_code=404, detail="Influencer profile not found")
+    
+    # Update fields that are provided
+    update_data = request.model_dump(exclude_unset=True, exclude={"user_id"})
+    
+    # Apply each field if it exists in update_data
+    for field, value in update_data.items():
+        if hasattr(influencer, field):
+            setattr(influencer, field, value)
+    
     db.commit()
-
-    return {"message": "Profile updated successfully"}
+    db.refresh(influencer)
+    
+    return {
+        "isSuccess": True,
+        "message": "Profile updated successfully",
+        "type": 0,
+        "data": {
+            "id": influencer.id,
+            "username": influencer.username,
+            "display_name": influencer.display_name,
+            "email": influencer.email,
+            "phone": influencer.phone,
+            "profile_image": influencer.profile_image,
+            "active": influencer.active,
+            "instagram_url": influencer.instagram_url,
+            "tiktok_url": influencer.tiktok_url,
+            "youtube_url": influencer.youtube_url
+        }
+    }

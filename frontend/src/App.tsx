@@ -14,14 +14,12 @@ import InfluencersPage from './pages/InfluencersPage';
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { SettingsPage } from './pages/SettingsPage';
 
-
-
 export type Page = 'dashboard' | 'campaigns' | 'reports' | 'generate-link' | 'companies' | 'influencers' | 'settings';
 
 const rolePages: Record<string, Page[]> = {
   admin: ['dashboard', 'campaigns', 'reports', 'generate-link', 'companies', 'influencers', 'settings'],
   company: ['dashboard', 'campaigns', 'reports', 'generate-link', 'settings'],
-  influencer: ['campaigns', 'reports', 'settings'],
+  influencer: ['campaigns', 'reports', 'generate-link', 'settings'],
 };
 
 function App() {

@@ -263,7 +263,25 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     MyPerformanceReports: "Kendi Performans Raporlarım",
     AnalyzeYourPerformance: "Kendi kampanya performansınızı analiz edin",
     MyReports: "Kampanya Raporlarım",
-    YourCampaignPerformance: "Kampanyalarınızın performansını görüntüleyin"
+    YourCampaignPerformance: "Kampanyalarınızın performansını görüntüleyin",
+
+    // Settings Page
+    ProfileSettings: "Profil Ayarları",
+    YourProfile: "Profiliniz",
+    BasicInfo: "Temel Bilgiler",
+    SocialMedia: "Sosyal Medya",
+    YourDisplayName: "Görünen Adınız",
+    YourEmail: "E-posta Adresiniz",
+    YourPhone: "Telefon Numaranız",
+    ProfileImageURL: "Profil Resmi URL",
+    ImageURLPlaceholder: "https://ornek.com/resim.jpg",
+    SaveProfile: "Profili Kaydet",
+    ProfilePreview: "Profil Önizleme",
+    AdminContactInfo: "Yardım için yönetici ile iletişime geçin",
+    SettingsNotAvailable: "Bu kullanıcı tipi için ayarlar mevcut değil",
+    TikTok: "TikTok",
+    YouTube: "YouTube",
+    Instagram: "Instagram"
   },
 
   en: {
@@ -498,7 +516,25 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     MyPerformanceReports: "My Performance Reports",
     AnalyzeYourPerformance: "Analyze your campaign performance",
     MyReports: "My Campaign Reports",
-    YourCampaignPerformance: "View your campaign performance"
+    YourCampaignPerformance: "View your campaign performance",
+
+    // Settings Page
+    ProfileSettings: "Profile Settings",
+    YourProfile: "Your Profile",
+    BasicInfo: "Basic Information",
+    SocialMedia: "Social Media",
+    YourDisplayName: "Your Display Name",
+    YourEmail: "Your Email Address",
+    YourPhone: "Your Phone Number",
+    ProfileImageURL: "Profile Image URL",
+    ImageURLPlaceholder: "https://example.com/image.jpg",
+    SaveProfile: "Save Profile",
+    ProfilePreview: "Profile Preview",
+    AdminContactInfo: "Contact administrator for assistance",
+    SettingsNotAvailable: "Settings not available for this user type",
+    TikTok: "TikTok",
+    YouTube: "YouTube",
+    Instagram: "Instagram"
   }
 };
 
