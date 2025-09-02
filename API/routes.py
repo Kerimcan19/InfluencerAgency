@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, Query, Body, HTTPException
 from typing import Optional
+from core.schemas import CampaignListResponse, CampaignOut, ReportListResponse, ReportOut, GenerateLinkRequest
+from core.models import User, Influencer
 from usecases.auth_use import get_current_user  # <-- your backend JWT auth
 from usecases.client import mlink_client  # <-- updated client with auto-login
+from database import get_db
+from sqlalchemy.orm import Session, selectinload
 
 router = APIRouter(prefix="/mlink", tags=["MLink"])
 
@@ -45,9 +49,17 @@ async def mlink_reports(
 
 @router.put("/generate-link")
 async def mlink_generate_link(
-    body: dict = Body(...),
+    body: GenerateLinkRequest,
     user=Depends(get_current_user),  
+    db: Session = Depends(get_db)
 ):
+    if user["role"] == "influencer":
+        influencer = db.query(Influencer).filter(User.id == user["sub"]).first()
+        if not influencer:
+            raise HTTPException(status_code=404, detail="Influencer not found") 
+        body.influencerID = str(influencer.id)
+        body.influencerName = influencer.username
+        return await mlink_client.generate_link(body)
     if user["role"] not in ["company", "admin"]:
         raise HTTPException(status_code=403, detail= "Access denied")
     return await mlink_client.generate_link(body)

@@ -10,17 +10,17 @@ interface DashboardPageProps {
   onAddToast: (message: string, type: 'success' | 'error' | 'warning') => void;
 }
 
-//const mockStats = [
-  //{ title: 'Active Campaigns', value: '24', change: '+12%', icon: TrendingUp, color: 'text-teal-600 bg-teal-50' },
- // { title: 'Total Clicks', value: '45.2K', change: '+8.1%', icon: MousePointer, color: 'text-purple-600 bg-purple-50' },
-//  { title: 'Total Sales', value: '$128.4K', change: '+23.5%', icon: DollarSign, color: 'text-green-600 bg-green-50' },
-//  { title: 'Commission', value: '$12.8K', change: '+18.2%', icon: Users, color: 'text-blue-600 bg-blue-50' },
-//];
+
 
 export function DashboardPage({ onAddToast }: DashboardPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [stats, setStats] = useState<DashboardSummaryResponse | null>(null);
+  const [stats, setStats] = useState<{
+    activeCampaigns: number;
+    totalClicks: number;
+    totalSales: number;
+    totalCommission: number;
+  } | null>(null);
   const [recentActivity, setRecentActivity] = useState<ActivityOut[]>([]);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [chartTotals, setChartTotals] = useState({ sales: 0, clicks: 0, conv: 0 });
@@ -36,19 +36,79 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
     String(d.getMonth() + 1).padStart(2, '0') + '.' +
     d.getFullYear();
 
-  const buildChartForRange = async (days: number) => {
+  // Calculate dashboard stats from reports
+  const calculateStatsFromReports = (reports: any[]) => {
+    const activeCampaigns = new Set<number>();
+    let totalClicks = 0;
+    let totalSales = 0;
+    let totalCommission = 0;
+    for (const r of reports) {
+      if (r.campaignID) activeCampaigns.add(Number(r.campaignID));
+      totalClicks += Number(r.totalClicks) || 0;
+      totalSales += Number(r.totalSales) || 0;
+      totalCommission += Number(r.brandCampaignCommisionAmount ?? 0) || 0;
+    }
+    return {
+      activeCampaigns: activeCampaigns.size,
+      totalClicks,
+      totalSales,
+      totalCommission,
+    };
+  };
+
+  // Fetch dashboard data from getReports only
+  const fetchDashboardData = async () => {
+    try {
+      const reportsRes = await getReports();
+      // Fix: if response is { data: [...] }, use reportsRes.data
+      // If response is { data: { data: [...] } }, use reportsRes.data.data
+      let reports: any[] = [];
+      if (Array.isArray(reportsRes.data)) {
+        reports = reportsRes.data;
+      } else if (reportsRes.data && Array.isArray(reportsRes.data.data)) {
+        reports = reportsRes.data.data;
+      }
+      // Debug: log the reports array to verify
+      // console.log('Dashboard reports:', reports);
+      setStats(calculateStatsFromReports(reports));
+      try {
+        const activity = await getDashboardActivity();
+        setRecentActivity(activity);
+      } catch {
+        setRecentActivity([]);
+      }
+    } catch (e) {
+      onAddToast('Failed to load dashboard data', 'error');
+    }
+  };
+
+  // Build chart for last 7 days only, mapping correctly from response
+  const buildChartForRange = async () => {
     const end = new Date();
+    const days = 7;
     const start = new Date();
     start.setDate(end.getDate() - (days - 1));
 
+    // Format dates as DD.MM.YYYY for API
+    const fmt = (d: Date) =>
+      String(d.getDate()).padStart(2, '0') + '.' +
+      String(d.getMonth() + 1).padStart(2, '0') + '.' +
+      d.getFullYear();
+
+    // Always use .data.data for mlink response
     const reportsRes = await getReports(undefined, fmt(start), fmt(end));
-    const rows: Report[] = reportsRes.data || [];
+    let rows: any[] = [];
+    if (Array.isArray(reportsRes.data)) {
+      rows = reportsRes.data;
+    } else if (reportsRes.data && Array.isArray(reportsRes.data.data)) {
+      rows = reportsRes.data.data;
+    }
 
-    const toKey = (iso: string) => iso.slice(0, 10);
+    // Group by day (using endDate in DD.MM.YYYY format)
     const byDay = new Map<string, { sales: number; clicks: number }>();
-
     for (const r of rows) {
-      const key = toKey(r.createdAt);
+      // Use endDate as DD.MM.YYYY
+      const key = r.endDate;
       const prev = byDay.get(key) || { sales: 0, clicks: 0 };
       byDay.set(key, {
         sales: prev.sales + (Number(r.totalSales) || 0),
@@ -56,70 +116,55 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
       });
     }
 
+    // Build last 7 days labels and values
     const result: ChartPoint[] = [];
-    // last 7 days shown; change 6→days-1 if you want the full range shown
-    const showDays = 7;
-    for (let i = showDays - 1; i >= 0; i--) {
+    for (let i = days - 1; i >= 0; i--) {
       const d = new Date(end);
       d.setDate(end.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
+      const key = fmt(d); // DD.MM.YYYY
       const w = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
       const v = byDay.get(key) || { sales: 0, clicks: 0 };
-      result.push({ day: w, sales: v.sales, clicks: v.clicks });
+      result.push({ day: `${w}`, sales: v.sales, clicks: v.clicks });
     }
 
     setChartData(result);
 
-    const totalSalesSum = result.reduce((sum, d) => sum + d.sales, 0);
-    const totalClicksSum = result.reduce((sum, d) => sum + d.clicks, 0);
+    // Fix: sum from rows, not result (result is per day, but rows is raw data)
+    const totalSalesSum = rows.reduce((sum, r) => sum + (Number(r.totalSales) || 0), 0);
+    const totalClicksSum = rows.reduce((sum, r) => sum + (Number(r.totalClicks) || 0), 0);
     const conversionRate = totalClicksSum
       ? Number(((totalSalesSum / totalClicksSum) * 100).toFixed(1))
       : 0;
     setChartTotals({ sales: totalSalesSum, clicks: totalClicksSum, conv: conversionRate });
-  };
-  const fetchDashboardData = async () => {
-    try {
-      const [summary, activity] = await Promise.all([
-        getDashboardSummary(),
-        getDashboardActivity(),
-      ]);
-      setStats(summary);
-      setRecentActivity(activity);
-    } catch (e) {
-      onAddToast('Failed to load dashboard data', 'error');
-    }
   };
 
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       await fetchDashboardData();
-      await buildChartForRange(rangeToDays(selectedRange));
+      await buildChartForRange();
       setIsLoading(false);
     };
     loadData();
-  }, []); // keep empty; initial mount  
-
+  }, []);
 
   useEffect(() => {
-    buildChartForRange(rangeToDays(selectedRange));
+    buildChartForRange();
   }, [selectedRange]);
 
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    setIsLoading(true);
     await Promise.all([
       fetchDashboardData(),
-      buildChartForRange(rangeToDays(selectedRange)),
+      buildChartForRange(),
     ]);
     setIsRefreshing(false);
-    setIsLoading(false);
+    onAddToast('Dashboard data refreshed successfully', 'success');
   };
 
   const handleQuickLink = () => {
-    onAddToast(t('RedirectingToLinkGenerator'), 'success');
-    window.location.assign("/generate-link");
+    onAddToast('Redirecting to link generator...', 'success');
   };
 
   if (isLoading) {
@@ -167,7 +212,6 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             {t('Refresh')}
           </button>
-
         </div>
       </div>
 

@@ -172,6 +172,7 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     FilterByUsername: "Kullanıcı adı ile ara",
     //Filter: "Filtrele",
     NoInfluencers: "Kayıt bulunamadı",
+    DetailedListOfInfluencerReports: "Detaylı Influencer Raporları Listesi",
 
     // Reports
     PerformanceReports: "Performans Raporları",
@@ -402,6 +403,7 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     FilterByUsername: "Search by username",
     //Filter: "Filter",
     NoInfluencers: "No records found",
+    DetailedListOfInfluencerReports: "Detailed List of Influencer Reports",
 
     // Reports
     PerformanceReports: "Performance Reports",

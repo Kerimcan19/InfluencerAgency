@@ -75,10 +75,10 @@ export const getCampaigns = async (
 
 export interface Report {
   id: number;
-  influencer_id: number;
+  influencerId: number;
   influencerName?: string | null;
   campaignId: number;
-  campaignName?: string | null;
+  name?: string | null;
   totalClicks: number;
   totalSales: number;
   createdAt: string;
@@ -91,6 +91,7 @@ export interface Report {
   mimedaCommissionAmount: string;
   agencyCommissionRate: string;
   agencyCommissionAmount: string;
+  endDate?: string
 }
 
 export interface ReportsResponse {
@@ -190,7 +191,7 @@ export const mlinkGetReports = async (params?: {
   StartDate?: string; // DD.MM.YYYY
   EndDate?: string;   // DD.MM.YYYY
 }) => {
-  const { data } = await apiClient.get("/Affiliate/GetReport", { params });
+  const { data } = await apiClient.get("/mlink/reports", { params });
   return data; // { data: [...], isSuccess, message, type }
 };
 

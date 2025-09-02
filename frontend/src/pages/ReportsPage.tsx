@@ -3,7 +3,6 @@ import { Download, Filter, TrendingUp, Users, MousePointer } from 'lucide-react'
 import { ReportsResponse, Report, mlinkGetReports } from '../services/api';
 import { apiClient } from '../services/api';
 import { useLang, translations } from '../contexts/LangContext';
-import { useAuth } from '../contexts/AuthContext';
 
 interface ReportsPageProps {
   onAddToast: (message: string, type: 'success' | 'error' | 'warning') => void;
@@ -19,8 +18,25 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const { lang } = useLang();
-  const { user } = useAuth(); // Use useAuth for user/role
   const t = (key: string) => translations[lang][key] || key;
+
+  const [influencerOptions, setInfluencerOptions] = useState<any[]>([]);
+
+  // Fetch all influencers for the filter dropdown (once on mount)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiClient.get('/admin/list_influencers');
+        if (res.data && res.data.isSuccess) {
+          setInfluencerOptions(res.data.data || []);
+        } else {
+          setInfluencerOptions([]);
+        }
+      } catch {
+        setInfluencerOptions([]);
+      }
+    })();
+  }, []);
 
   function getDateRangeParams(range: string) {
       const today = new Date();
@@ -114,28 +130,6 @@ const handleExportCSV = async () => {
 
 
 
-  // Aggregate influencer stats (sum per influencer, not per report)
-  const influencerAggregates = React.useMemo(() => {
-    const map = new Map<string, any>();
-    for (const r of influencers) {
-      const key = r.influencer_id;
-      if (!map.has(key)) {
-        map.set(key, {
-          influencer_id: r.influencer_id,
-          influencerName: r.influencerName,
-          totalClicks: 0,
-          totalSales: 0,
-          influencerCommissionAmount: 0,
-        });
-      }
-      const agg = map.get(key);
-      agg.totalClicks += Number(r.totalClicks) || 0;
-      agg.totalSales += Number(r.totalSales) || 0;
-      agg.influencerCommissionAmount += Number(r.influencerCommissionAmount) || 0;
-    }
-    return Array.from(map.values());
-  }, [influencers]);
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -188,14 +182,13 @@ const handleExportCSV = async () => {
               <option value="all">{t('AllInfluencers')}</option>
               {loading ? (
                 <option disabled>{t('Loading')}...</option>
-                ) : (
-                  influencers.map((report: any) => (
-                    <option key={report.influencer_id} value={report.influencer_id}>
-                      {report.influencerName}
-                    </option>
-                  ))
-                )}
-
+              ) : (
+                influencerOptions.map((inf: any) => (
+                  <option key={inf.id} value={inf.id}>
+                    {inf.display_name || inf.username}
+                  </option>
+                ))
+              )}
             </select>
           </div>
           
@@ -276,32 +269,38 @@ const handleExportCSV = async () => {
 
             <tbody className="bg-white divide-y divide-gray-200">
               {influencers.map((r: any) => {
+                // Find influencer by id (from report: influencerID or influencer_id)
+                const inf = influencerOptions.find(
+                  (i) => String(i.id) === String(r.influencerID || r.influencer_id)
+                );
+                const influencerName = inf?.display_name || inf?.username || r.influencerName || `#${r.influencerID || r.influencer_id}`;
+
+                // Campaign name: use r.name if present, else fallback to campaignID
+                const campaignName = r.name || r.campaignName || `#${r.campaignID || r.campaignId}`;
+
                 const conv =
                   r.totalClicks > 0 ? ((r.totalSales / r.totalClicks) * 100).toFixed(2) + '%' : '0.00%';
 
                 return (
-                  <tr key={`${r.influencer_id}-${r.campaignId}`} className="hover:bg-gray-50">
+                  <tr key={`${r.influencerID || r.influencer_id}-${r.campaignID || r.campaignId}`} className="hover:bg-gray-50">
                     {/* Influencer (left, with avatar showing first 2 letters) */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold uppercase">
-                          {r.influencerName
-                            ? r.influencerName.slice(0, 2)
-                            : '??'}
+                          {influencerName.slice(0, 2)}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-semibold text-gray-900">
-                            {r.influencerName ?? `#${r.influencer_id}`}
+                            {influencerName}
                           </div>
                         </div>
                       </div>
                     </td>
 
-
                     {/* Campaign (left, blue pill) */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-block px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold tracking-tight">
-                        {r.campaignName ?? `#${r.campaignId}`}
+                        {campaignName}
                       </span>
                     </td>
 
@@ -503,7 +502,7 @@ const handleExportCSV = async () => {
       </div>
 
       {/* Performance Insights */}
-      {user?.user?.role === 'admin' && (
+      {/* Performance Insights */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('PerformanceInsights')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -511,12 +510,12 @@ const handleExportCSV = async () => {
             {/* Top Performers */}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">{t('TopPerformers')}</h4>
-              {[...influencerAggregates]
+              {[...influencers]
                 .filter(i => i.totalClicks > 0)
                 .sort((a, b) => (b.totalSales / b.totalClicks) - (a.totalSales / a.totalClicks))
                 .slice(0, 3)
                 .map((inf, index) => (
-                  <div key={inf.influencer_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={inf.campaignID} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                         index === 0 ? 'bg-yellow-500' :
@@ -536,11 +535,11 @@ const handleExportCSV = async () => {
             {/* Revenue Leaders */}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">{t('RevenueLeaders')}</h4>
-              {[...influencerAggregates]
+              {[...influencers]
                 .sort((a, b) => b.influencerCommissionAmount - a.influencerCommissionAmount)
                 .slice(0, 3)
                 .map((inf, index) => (
-                  <div key={inf.influencer_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={inf.campaignID} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                         index === 0 ? 'bg-green-500' :
@@ -551,14 +550,15 @@ const handleExportCSV = async () => {
                       <span className="text-sm font-medium">{inf.influencerName}</span>
                     </div>
                     <span className="text-sm text-green-600 font-medium">
-                      ₺{inf.influencerCommissionAmount.toLocaleString()}
+                      ₺{inf.influencerCommissionAmount}
                     </span>
                   </div>
                 ))}
             </div>
+
           </div>
         </div>
-      )}
+
     </div>
   );
 }

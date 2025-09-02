@@ -486,9 +486,9 @@ def import_mlink_campaigns(
         "data": {"count": imported}
     }
 
-@router.get("/list-influencers/{campaign_id}")
+@router.get("/list-influencers")
 def list_influencers(
-    campaign_id: int,
+    campaign_id: Optional[int],
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
@@ -496,11 +496,13 @@ def list_influencers(
     if not user or user.role not in ["admin", "company"]:
         raise HTTPException(status_code=404, detail="User not found")
     
-    campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
-    if not campaign:
-        raise HTTPException(status_code=404, detail="Campaign not found")
-    
-    influencers = campaign.influencers  # uses the many-to-many relationship
+    if campaign_id:
+        campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
+        if not campaign:
+            raise HTTPException(status_code=404, detail="Campaign not found")
+        influencers = campaign.influencers
+    else:
+        influencers = db.query(Influencer).all()
     return {
         "isSuccess": True,
         "message": None,
