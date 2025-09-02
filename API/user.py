@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, selectinload
 from database import get_db, frontend_url
 from core.models import Campaign, Report, User, TrackingLink, ActivityLog, Influencer
 from core.schemas import CampaignListResponse, CampaignOut, ReportOut, ReportListResponse, GenerateLinkRequest, GenerateLinkResponse, GeneratedLinkData
-from core.schemas import ResetPasswordRequest
+from core.schemas import ResetPasswordRequest, InfluencerUpdate
 from usecases.auth_use import get_current_user, create_link_token, decode_access_token, hash_password
 from typing import Optional
 from datetime import datetime
