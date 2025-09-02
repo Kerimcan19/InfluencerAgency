@@ -108,8 +108,8 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
       </div>
       
       {/* Profile Form */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-400">
-        <div className="px-6 py-4 border-b border-gray-400">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300">
+        <div className="px-6 py-4 border-b border-gray-300">
           <h3 className="text-lg font-semibold text-gray-900">{t('YourProfile')}</h3>
         </div>
         
@@ -134,7 +134,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="display_name"
                     value={formData.display_name}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder={t('YourDisplayName')}
                   />
                 </div>
@@ -155,7 +155,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder={t('YourEmail')}
                   />
                 </div>
@@ -176,7 +176,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="phone"
                     value={formData.phone || ''}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder={t('YourPhone')}
                   />
                 </div>
@@ -197,7 +197,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="profile_image"
                     value={formData.profile_image || ''}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder={t('ImageURLPlaceholder')}
                   />
                 </div>
@@ -225,7 +225,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="instagram_url"
                     value={formData.instagram_url || ''}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder="https://instagram.com/username"
                   />
                 </div>
@@ -252,7 +252,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="tiktok_url"
                     value={formData.tiktok_url || ''}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder="https://tiktok.com/@username"
                   />
                 </div>
@@ -273,7 +273,7 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
                     id="youtube_url"
                     value={formData.youtube_url || ''}
                     onChange={handleChange}
-                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-400 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="block w-full pl-10 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder="https://youtube.com/c/channelname"
                   />
                 </div>
@@ -299,12 +299,12 @@ export function SettingsPage({ onAddToast }: SettingsPageProps) {
       
       {/* Profile Preview */}
       {formData.profile_image && (
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-400">
-          <div className="px-6 py-4 border-b-2 border-gray-400">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300">
+          <div className="px-6 py-4 border-b border-gray-300">
             <h3 className="text-lg font-semibold text-gray-900">{t('ProfilePreview')}</h3>
           </div>
           <div className="p-6 flex flex-col items-center">
-            <div className="w-36 h-36 rounded-full overflow-hidden mb-4 border-2 border-purple-400 shadow-md">
+            <div className="w-36 h-36 rounded-full overflow-hidden mb-4 border border-gray-300 shadow-sm">
               <img 
                 src={formData.profile_image} 
                 alt={formData.display_name} 

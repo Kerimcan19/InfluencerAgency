@@ -217,10 +217,14 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     FailedToCopy: "Link kopyalanamadı. Lütfen tekrar deneyin.",
     NextSteps: "Sonraki adımlar:",
     ShareTrackingLink: "Bu takip linkini {influencerName} ile paylaşın. Tüm tıklamalar ve dönüşümler otomatik olarak takip edilecektir.",
+    TrackingLinkDetails: "Takip Linki Detayları",
+    GenerateLink: "Link Oluştur",
+    StartOver: "Baştan Başla",
 
     // Settings
     //Settings: "Ayarlar",
-    UpdateProfile: "Profil bilgilerinizi ve tercihlerinizi güncelleyin.",
+    UpdateProfile: "Profil bilgilerinizi ve tercihlerinizi güncelleyin",
+    UpdateYourProfile: "Profil bilgilerinizi güncelleyin",
     //DisplayName: "Görünen Ad",
     //Email: "E-posta",
     //Phone: "Telefon",
@@ -448,7 +452,7 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     RevenueLeaders: "Revenue Leaders",
     NoData: "No data for the selected period",
     ReportCreatedOn: "Report created on",
-    Brand: "Brand",
+    Brand: "Marka",
     Mimeda: "Mimeda",
     Agency: "Agency",
     Other: "Other",
@@ -470,10 +474,14 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     FailedToCopy: "Failed to copy link. Please try again.",
     NextSteps: "Next steps:",
     ShareTrackingLink: "Share this tracking link with {influencerName}. All clicks and conversions will be automatically tracked and attributed to their performance.",
+    TrackingLinkDetails: "Tracking Link Details",
+    GenerateLink: "Generate Link", 
+    StartOver: "Start Over",
 
     // Settings
     //Settings: "Settings",
-    UpdateProfile: "Update your profile information and preferences.",
+    UpdateProfile: "Update your profile information and preferences",
+    UpdateYourProfile: "Update your profile information",
     //DisplayName: "Display Name",
     //Email: "Email",
     //Phone: "Phone",
@@ -483,7 +491,7 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     PasswordsDoNotMatch: "Passwords do not match",
     ProfileUpdated: "Profile updated successfully",
     UpdateFailed: "Update failed",
-
+    
     // Reset Password
     ResetPasswordTitle: "Reset Password",
     PleaseFillAllFields: "Please fill in all fields.",

@@ -146,116 +146,122 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center">
-        <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-          <Link2 className="h-6 w-6 text-purple-600" />
+        <div className="mx-auto w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+          <Link2 className="h-8 w-8 text-purple-600" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900">{t('GenerateTrackingLink')}</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-gray-600">
           {t('CreateTrackingLinks')}
         </p>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">{t('ChooseTheCampaignThisLinkWillTrack')}</h3>
-          <p className="text-sm text-gray-500">{t('SelectCampaign')}</p>
+      <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300">
+        <div className="px-6 py-4 border-b border-gray-300">
+          <h3 className="text-lg font-semibold text-gray-900">{t('TrackingLinkDetails')}</h3>
         </div>
-
-        {/* Campaign selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div>
-            <select
-              value={selectedCampaign}
-              onChange={e => setSelectedCampaign(e.target.value)}
-              className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200"
-            >
-              <option value="">{t('SelectCampaign')}</option>
-              {campaigns.map(campaign => (
-                <option key={campaign.id} value={campaign.id}>
-                  {campaign.name}
-                </option>
-              ))}
-            </select>
+        
+        <div className="p-6 space-y-6">
+          {/* Campaign selection */}
+          <div className="mb-6">
+            <h3 className="text-md font-medium text-gray-700 mb-3">{t('ChooseTheCampaignThisLinkWillTrack')}</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <select
+                  value={selectedCampaign}
+                  onChange={e => setSelectedCampaign(e.target.value)}
+                  className="w-full py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200"
+                >
+                  <option value="">{t('SelectCampaign')}</option>
+                  {campaigns.map(campaign => (
+                    <option key={campaign.id} value={campaign.id}>
+                      {campaign.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Only show influencer selection for admin/company users */}
-        {!isInfluencer && (
-          <>
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2">{t('SelectInfluencer')}</h3>
-              <p className="text-sm text-gray-500">
+          {/* Only show influencer selection for admin/company users */}
+          {!isInfluencer && (
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <h3 className="text-md font-medium text-gray-700 mb-2">{t('SelectInfluencer')}</h3>
+              <p className="text-sm text-gray-500 mb-3">
                 {selectedCampaign
                   ? influencers.length === 0
                     ? t('NoInfluencersForCampaign')
                     : t('SelectInfluencer')
                   : t('SelectCampaignFirst')}
               </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <div>
-                <select
-                  value={selectedInfluencerId}
-                  onChange={e => setSelectedInfluencerId(e.target.value)}
-                  disabled={!selectedCampaign || influencerLoading}
-                  className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 disabled:opacity-50"
-                >
-                  <option value="">{t('SelectInfluencer')}</option>
-                  {influencers.map(inf => (
-                    <option key={inf.id} value={inf.id}>
-                      {inf.display_name || inf.username}
-                    </option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <select
+                    value={selectedInfluencerId || ''}
+                    onChange={e => setSelectedInfluencerId(e.target.value ? Number(e.target.value) : null)}
+                    disabled={!selectedCampaign || influencerLoading}
+                    className="w-full py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 disabled:opacity-50"
+                  >
+                    <option value="">{t('SelectInfluencer')}</option>
+                    {influencers.map(inf => (
+                      <option key={inf.id} value={inf.id}>
+                        {inf.display_name || inf.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        {/* Actions */}
-        <div className="flex justify-end">
-          <button
-            onClick={handleGenerateLink}
-            disabled={!selectedCampaign || isGenerating || (!isInfluencer && !selectedInfluencerId)}
-            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
-          >
-            {isGenerating ? t('Generating') : t('GenerateLink')}
-          </button>
+          {/* Actions */}
+          <div className="pt-5 flex justify-center">
+            <button
+              onClick={handleGenerateLink}
+              disabled={!selectedCampaign || isGenerating || (!isInfluencer && !selectedInfluencerId)}
+              className="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 shadow-sm inline-flex items-center"
+            >
+              <Link2 className="h-4 w-4 mr-2" />
+              {isGenerating ? t('Generating') : t('GenerateLink')}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Generated Link */}
       {generatedLink && (
-        <div className="bg-white rounded-lg shadow p-6 animate-in fade-in-0 slide-in-from-bottom-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('LinkGenerated')}</h3>
-          <div className="space-y-4">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300 animate-in fade-in-0 slide-in-from-bottom-4">
+          <div className="px-6 py-4 border-b border-gray-300">
+            <h3 className="text-lg font-semibold text-gray-900">{t('LinkGenerated')}</h3>
+          </div>
+          
+          <div className="p-6 space-y-6">
             {/* Link Display */}
-            <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-300">
               <div className="flex items-center justify-between">
                 <code className="text-sm text-gray-800 break-all flex-1 mr-4">
                   {generatedLink}
                 </code>
                 <button
                   onClick={handleCopyLink}
-                  className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     copied
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                      ? 'bg-green-100 text-green-800 border border-green-300'
+                      : 'bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-300'
                   }`}
                 >
                   {copied ? (
                     <>
-                      <Check className="h-4 w-4 mr-1" />
+                      <Check className="h-4 w-4 mr-2" />
                       {t('LinkCopied')}
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4 mr-1" />
+                      <Copy className="h-4 w-4 mr-2" />
                       {t('Copy')}
                     </>
                   )}
@@ -265,34 +271,44 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
 
             {/* Link Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="p-3 bg-blue-50 rounded-lg">
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="font-medium text-blue-900">{t('Influencer')}</div>
-                <div className="text-blue-700">{influencerName}</div>
+                <div className="text-blue-700 mt-1">{influencerName}</div>
               </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
+              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
                 <div className="font-medium text-purple-900">{t('Campaign')}</div>
-                <div className="text-purple-700">
+                <div className="text-purple-700 mt-1">
                   {selectedCampaignObj?.name}
                 </div>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="font-medium text-green-900">{t('InfluencerCommission')}</div>
-                <div className="text-green-700">
+                <div className="text-green-700 mt-1">
                   {selectedCampaignObj?.influencerCommissionRate}%
                 </div>
               </div>
             </div>
 
             {/* Instructions */}
-            <div className="p-4 bg-amber-50 border-l-4 border-amber-400">
+            <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
               <div className="flex">
-                <div className="ml-3">
+                <div>
                   <p className="text-sm text-amber-700">
                     <strong>{t('NextSteps')}:</strong>{" "}
                     {tWithVars(t('ShareTrackingLink'), { influencerName })}
                   </p>
                 </div>
               </div>
+            </div>
+            
+            {/* Reset Button */}
+            <div className="pt-2 flex justify-center">
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-300 rounded-md"
+              >
+                {t('StartOver')}
+              </button>
             </div>
           </div>
         </div>
