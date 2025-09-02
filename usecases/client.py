@@ -47,8 +47,14 @@ class MLinkClient:
         async with httpx.AsyncClient(timeout=30, headers=await self._headers()) as s:
             r = await s.get(f"{MLINK_BASE}/Affiliate/GetReport", params=params or {})
             r.raise_for_status()
-            return r.json() 
+            return r.json()
 
+    async def get_report_influencer(self, influencer_id: str, params=None):
+        async with httpx.AsyncClient(timeout=30, headers=await self._headers()) as s:
+            r = await s.get(f"{MLINK_BASE}/Affiliate/GetReport", params=params or {})
+            r.raise_for_status()
+            return r.json()
+        
     async def generate_link(self, body):
         async with httpx.AsyncClient(timeout=30, headers=await self._headers()) as s:
             r = await s.put(f"{MLINK_BASE}/Affiliate/GenerateLink", json=body)

@@ -259,11 +259,7 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     FailedToLoadDashboard: "Panel verileri yüklenemedi",
     DashboardRefreshed: "Panel verileri başarıyla yenilendi",
     RedirectingToLinkGen: "Link oluşturucuya yönlendiriliyor...",
-    ChooseTheCampaignThisLinkWillTrack: "Bu linkin takip edeceği kampanyayı seçin",
-    MyPerformanceReports: "Kendi Performans Raporlarım",
-    AnalyzeYourPerformance: "Kendi kampanya performansınızı analiz edin",
-    MyReports: "Kampanya Raporlarım",
-    YourCampaignPerformance: "Kampanyalarınızın performansını görüntüleyin"
+    ChooseTheCampaignThisLinkWillTrack: "Bu linkin takip edeceği kampanyayı seçin"
   },
 
   en: {
@@ -494,11 +490,7 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
     FailedToLoadDashboard: "Failed to load dashboard data",
     DashboardRefreshed: "Dashboard data refreshed successfully",
     RedirectingToLinkGen: "Redirecting to link generator...",
-    ChooseTheCampaignThisLinkWillTrack: "Choose the Campaign This Link Will Track",
-    MyPerformanceReports: "My Performance Reports",
-    AnalyzeYourPerformance: "Analyze your campaign performance",
-    MyReports: "My Campaign Reports",
-    YourCampaignPerformance: "View your campaign performance"
+    ChooseTheCampaignThisLinkWillTrack: "Choose the Campaign This Link Will Track"
   }
 };
 

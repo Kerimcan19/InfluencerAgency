@@ -39,6 +39,20 @@ class InfluencerBase(BaseModel):
     profile_image: Optional[str]
     active: bool
 
+class InfluencerUpdate(InfluencerBase):
+    # Make all fields optional for updates
+    username: Optional[str] = None
+    display_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    follower_count: Optional[int] = None
+    engagement_rate: Optional[Decimal] = None
+    instagram_url: Optional[str] = None
+    tiktok_url: Optional[str] = None
+    youtube_url: Optional[str] = None
+    social_links_json: Optional[dict] = None
+    source_payload_json: Optional[dict] = None
+    user_id: Optional[int] = None
+
 class InfluencerOut(InfluencerBase):
     id: int
 

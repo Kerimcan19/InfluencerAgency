@@ -77,8 +77,8 @@ const InfluencersPage: React.FC = () => {
     try {
       const params: any = {};
       if (filters.name.trim()) params.name = filters.name.trim();
-      const res = await apiClient.get('/admin/list_influencers', { params });
-      // Always use res.data.data for influencer array
+      const res = await apiClient.get<Influencer[]>('/admin/list_influencers', { params });
+      // endpoint returns a plain array (not an envelope)
       setRows(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
       console.error(err);

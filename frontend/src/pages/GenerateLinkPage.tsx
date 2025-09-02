@@ -4,6 +4,7 @@ import { getCampaigns, generateTrackingLink } from '../services/api';
 import type { Campaign } from '../services/api';
 import { apiClient } from '../services/api';
 import { useLang, translations, tWithVars } from '../contexts/LangContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface GenerateLinkPageProps {
   onAddToast: (message: string, type: 'success' | 'error' | 'warning') => void;
@@ -28,8 +29,11 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
   const selectedCampaignObj = campaigns.find(c => c.id.toString() === selectedCampaign);
   const [influencers, setInfluencers] = useState<InfluencerLite[]>([]);
   const [selectedInfluencerId, setSelectedInfluencerId] = useState<number | null>(null);
+  const [influencerLoading, setInfluencerLoading] = useState(false);
   const { lang } = useLang();
   const t = (key: string) => translations[lang][key] || key;
+  const { user } = useAuth();
+  const isInfluencer = user?.user?.role === 'influencer';
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -47,13 +51,15 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
     fetchCampaigns();
   }, []);
 
-  // Fetch all influencers once on mount (not filtered by campaign)
+  // Fetch influencers based on campaign selection and user role
   useEffect(() => {
+    if (isInfluencer) return; // Don't fetch for influencer users
     let mounted = true;
     (async () => {
       try {
-        const res = await apiClient.get('/admin/list_influencers');
-        if (mounted && res.data && res.data.isSuccess) {
+        setInfluencerLoading(true);
+        const res = await apiClient.get('/list-influencers', { params: { campaign_id: selectedCampaign } });
+        if (mounted && res.data?.isSuccess) {
           setInfluencers(res.data.data || []);
         } else if (mounted) {
           setInfluencers([]);
@@ -63,10 +69,12 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
           setInfluencers([]);
           onAddToast(t('FailedToLoadInfluencers'), 'error');
         }
+      } finally {
+        setInfluencerLoading(false);
       }
     })();
     return () => { mounted = false; };
-  }, []); // Only run once on mount
+  }, [selectedCampaign, isInfluencer, onAddToast]); // Re-run when campaign changes or on mount
 
   useEffect(() => {
     if (!selectedInfluencerId) {
@@ -79,29 +87,41 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
     setInfluencerName(inf ? (inf.display_name || inf.username || '') : '');
   }, [selectedInfluencerId, influencers]);
 
-  const handleGenerateLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!influencerId || !influencerName || !selectedCampaign) {
-      onAddToast(t('PleaseFillAllFields'), 'warning');
-      return;
-    }
-
-    setIsGenerating(true);
+  const handleGenerateLink = async () => {
     try {
-      const campaignId = parseInt(selectedCampaign);
-      const response = await generateTrackingLink(influencerId, influencerName, campaignId);
+      setIsGenerating(true);
+      // For influencers, use their own ID and name
+      const payload = isInfluencer 
+        ? {
+            influencerID: user.user.id.toString(),
+            influencerName: user.user.display_name || user.user.username || 'Influencer',
+            campaignID: Number(selectedCampaign)
+          }
+        : {
+            influencerID: selectedInfluencerId,
+            influencerName: influencers.find(inf => inf.id == selectedInfluencerId)?.display_name || '',
+            campaignID: Number(selectedCampaign)
+          };
 
-      if (response.isSuccess && response.data?.url) {
+      const response = await apiClient.put('/mlink/generate-link', payload);
+
+      // Fixed: Check for data.url property instead of isSuccess only
+      if (response.data?.isSuccess && response.data?.data?.url) {
+        setGeneratedLink(response.data.data.url);
+        onAddToast(response.data.message || t('LinkGenerated'), 'success');
+      } else if (response.data?.isSuccess && typeof response.data?.url === 'string') {
+        // Handle direct URL in response structure
         setGeneratedLink(response.data.url);
-        onAddToast(t('LinkGenerated'), 'success');
+        onAddToast(response.data.message || t('LinkGenerated'), 'success');
       } else {
-        onAddToast(response.message || t('FailedToGenerateLink'), 'error');
+        onAddToast(response.data?.message || t('FailedToGenerateLink'), 'error');
       }
-    } catch (err) {
-      onAddToast(t('FailedToGenerateLink'), 'error');
+    } catch (err: any) {
+      console.error("Link generation error:", err);
+      onAddToast(err?.response?.data?.message || t('FailedToGenerateLink'), 'error');
+    } finally {
+      setIsGenerating(false);
     }
-    setIsGenerating(false);
   };
 
   const handleCopyLink = async () => {
@@ -126,7 +146,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
         <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
@@ -140,87 +160,73 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
 
       {/* Form */}
       <div className="bg-white rounded-lg shadow p-6">
-        <form onSubmit={handleGenerateLink} className="space-y-6">
-          {/* Campaign Selection FIRST */}
-          <div>
-            <label htmlFor="campaign" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('Campaign')} <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <select
-                id="campaign"
-                value={selectedCampaign}
-                onChange={(e) => setSelectedCampaign(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                required
-              >
-                <option value="">{t('SelectCampaign')}</option>
-                {campaigns.map((campaign) => (
-                  <option key={campaign.id} value={campaign.id.toString()}>
-                    {campaign.name} ({campaign.influencerCommissionRate}% {t('InfluencerCommission')})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <p className="mt-1 text-xs text-gray-500">
-              {t('ChooseTheCampaignThisLinkWillTrack')}
-            </p>
-          </div>
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">{t('ChooseTheCampaignThisLinkWillTrack')}</h3>
+          <p className="text-sm text-gray-500">{t('SelectCampaign')}</p>
+        </div>
 
-          {/* Influencer Selection, filtered by campaign */}
+        {/* Campaign selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('Influencer')} <span className="text-red-500">*</span>
-            </label>
-            <InfluencerSelect
-              items={influencers}
-              value={selectedInfluencerId}
-              onChange={setSelectedInfluencerId}
-              placeholder={
-                selectedCampaign
-                  ? influencers.length
-                    ? t('TypeNameOrUsername')
-                    : t('NoInfluencersForCampaign')
-                  : t('SelectCampaignFirst')
-              }
-            />
-            {!!influencerId && (
-              <p className="mt-2 text-xs text-gray-600">
-                {t('Selected')}: <strong>{influencerName}</strong> (ID: {influencerId})
+            <select
+              value={selectedCampaign}
+              onChange={e => setSelectedCampaign(e.target.value)}
+              className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200"
+            >
+              <option value="">{t('SelectCampaign')}</option>
+              {campaigns.map(campaign => (
+                <option key={campaign.id} value={campaign.id}>
+                  {campaign.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Only show influencer selection for admin/company users */}
+        {!isInfluencer && (
+          <>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">{t('SelectInfluencer')}</h3>
+              <p className="text-sm text-gray-500">
+                {selectedCampaign
+                  ? influencers.length === 0
+                    ? t('NoInfluencersForCampaign')
+                    : t('SelectInfluencer')
+                  : t('SelectCampaignFirst')}
               </p>
-            )}
-          </div>
+            </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              type="submit"
-              disabled={isGenerating}
-              className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isGenerating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  {t('Generating')}
-                </>
-              ) : (
-                <>
-                  <Link2 className="h-4 w-4 mr-2" />
-                  {t('GenerateLink')}
-                </>
-              )}
-            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <div>
+                <select
+                  value={selectedInfluencerId}
+                  onChange={e => setSelectedInfluencerId(e.target.value)}
+                  disabled={!selectedCampaign || influencerLoading}
+                  className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 disabled:opacity-50"
+                >
+                  <option value="">{t('SelectInfluencer')}</option>
+                  {influencers.map(inf => (
+                    <option key={inf.id} value={inf.id}>
+                      {inf.display_name || inf.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </>
+        )}
 
-            <button
-              type="button"
-              onClick={handleReset}
-              className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
-            >
-              {t('Reset')}
-            </button>
-          </div>
-        </form>
+        {/* Actions */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleGenerateLink}
+            disabled={!selectedCampaign || isGenerating || (!isInfluencer && !selectedInfluencerId)}
+            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
+          >
+            {isGenerating ? t('Generating') : t('GenerateLink')}
+          </button>
+        </div>
       </div>
 
       {/* Generated Link */}

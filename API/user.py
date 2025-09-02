@@ -114,3 +114,15 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
     db.commit()
 
     return {"message": "Password reset successful"}
+
+@router.patch("/update-influencer-profile")
+def update_profile(request: InfluencerUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == request.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.name = request.name
+    user.email = request.email
+    db.commit()
+
+    return {"message": "Profile updated successfully"}
