@@ -75,9 +75,9 @@ export const getCampaigns = async (
 
 export interface Report {
   id: number;
-  influencerId: number;
+  influencerID: number;
   influencerName?: string | null;
-  campaignId: number;
+  campaignID: number;
   name?: string | null;
   totalClicks: number;
   totalSales: number;

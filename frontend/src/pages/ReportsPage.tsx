@@ -205,7 +205,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                   <div className="p-8 border-b-2 border-gray-300 flex items-center justify-between">
                     <div>
                       <div className="text-lg font-semibold text-gray-900">
-                        {mySelectedReport.name || mySelectedReport.name || `#${mySelectedReport.campaignId || mySelectedReport.campaignId}`}
+                        {mySelectedReport.name || mySelectedReport.name || `#${mySelectedReport.campaignID || mySelectedReport.campaignId}`}
                       </div>
                     </div>
                     <button
@@ -515,20 +515,20 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
 
             <tbody className="bg-white divide-y divide-gray-200">
               {influencers.map((r: any) => {
-                // Find influencer by id (from report: influencerID or influencer_id)
+                // Find influencer by id (from report: influencerID)
                 const inf = influencerOptions.find(
-                  (i) => String(i.id) === String(r.influencerID || r.influencer_id)
+                  (i) => String(i.id) === String(r.influencerID)
                 );
-                const influencerName = inf?.display_name || inf?.username || r.influencerName || `#${r.influencerID || r.influencer_id}`;
+                const influencerName = inf?.display_name || inf?.username || r.influencerName || `#${r.influencerID}`;
 
-                // Campaign name: use r.name if present, else fallback to campaignID
-                const campaignName = r.name || r.campaignName || `#${r.campaignID || r.campaignId}`;
+                // Campaign name: use r.name if present
+                const campaignName = r.name || `#${r.campaignID}`;
 
                 const conv =
                   r.totalClicks > 0 ? ((r.totalSales / r.totalClicks) * 100).toFixed(2) + '%' : '0.00%';
 
                 return (
-                  <tr key={`${r.influencerID || r.influencer_id}-${r.campaignID || r.campaignId}`} className="hover:bg-gray-50">
+                  <tr key={`${r.influencerID}-${r.campaignID}`} className="hover:bg-gray-50">
                     {/* Influencer (left, with avatar showing first 2 letters) */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div className="flex items-center">
@@ -574,7 +574,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                     {/* Commission (RIGHT, green) */}
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <span className="inline-block px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-sm font-semibold tracking-tight tabular-nums">
-                        ₺{Number(r.influencerCommissionAmount ?? 0).toLocaleString()}
+                        ₺{Number(r.influencerCommisionAmount ?? 0).toLocaleString()}
                       </span>
                     </td>
 
@@ -608,7 +608,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                     <div className="h-14 w-14 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold uppercase">
                       {(() => {
                         const inf = influencerOptions.find(
-                          (i) => String(i.id) === String(selectedReport.influencerId || selectedReport.influencer_id)
+                          (i) => String(i.id) === String(selectedReport.influencerID)
                         );
                         const name = inf?.display_name || inf?.username || selectedReport.influencerName || "??";
                         return name.slice(0, 2);
@@ -618,16 +618,21 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                       <div className="text-lg font-semibold text-gray-900">
                         {(() => {
                           const inf = influencerOptions.find(
-                            (i) => String(i.id) === String(selectedReport.influencerId || selectedReport.influencer_id)
+                            (i) => String(i.id) === String(selectedReport.influencerID)
                           );
-                          return inf?.display_name || inf?.username || selectedReport.influencerName || `#${selectedReport.influencerId || selectedReport.influencer_id}`;
+                          return inf?.display_name || inf?.username || selectedReport.influencerName || `#${selectedReport.influencerID}`;
                         })()}
                       </div>
                       <div className="mt-1">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold tracking-tight">
-                          {selectedReport.name || selectedReport.name || `#${selectedReport.campaignId || selectedReport.campaignId}`}
+                          {selectedReport.name || `#${selectedReport.campaignID}`}
                         </span>
                       </div>
+                      {selectedReport.endDate && (
+                        <div className="mt-1 text-xs text-gray-500">
+                          {t('EndDate')}: {selectedReport.endDate}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -684,13 +689,13 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Brand')}</span>
                           <span className="tabular-nums">
-                            ₺{Number(selectedReport.brandCommissionAmount ?? 0).toLocaleString()}
+                            ₺{Number(selectedReport.brandCampaignCommisionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Influencer')}</span>
                           <span className="tabular-nums">
-                            ₺{Number(selectedReport.influencerCommissionAmount ?? 0).toLocaleString()}
+                            ₺{Number(selectedReport.influencerCommisionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -716,23 +721,33 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Brand')}</span>
-                          <span className="tabular-nums">{Number(selectedReport.brandCommissionRate ?? 0)}%</span>
+                          <span className="tabular-nums">
+                            {Number(selectedReport.brandCampaignCommisionRate ?? 0).toFixed(2)}%
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Influencer')}</span>
-                          <span className="tabular-nums">{Number(selectedReport.influencerCommissionRate ?? 0)}%</span>
+                          <span className="tabular-nums">
+                            {Number(selectedReport.influencerCommisionRate ?? 0).toFixed(2)}%
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Other')}</span>
-                          <span className="tabular-nums">{Number(selectedReport.otherCostsRate ?? 0)}%</span>
+                          <span className="tabular-nums">
+                            {Number(selectedReport.otherCostsRate ?? 0).toFixed(2)}%
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Mimeda')}</span>
-                          <span className="tabular-nums">{Number(selectedReport.mimedaCommissionRate ?? 0)}%</span>
+                          <span className="tabular-nums">
+                            {Number(selectedReport.mimedaCommissionRate ?? 0).toFixed(2)}%
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Agency')}</span>
-                          <span className="tabular-nums">{Number(selectedReport.agencyCommissionRate ?? 0)}%</span>
+                          <span className="tabular-nums">
+                            {Number(selectedReport.agencyCommissionRate ?? 0).toFixed(2)}%
+                          </span>
                         </div>
                       </div>
                     </div>

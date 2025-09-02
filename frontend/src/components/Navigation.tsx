@@ -207,7 +207,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                   <div className="p-8 border-b-2 border-gray-300 flex items-center justify-between">
                     <div>
                       <div className="text-lg font-semibold text-gray-900">
-                        {mySelectedReport.name || mySelectedReport.name || `#${mySelectedReport.campaignId || mySelectedReport.campaignId}`}
+                        {mySelectedReport.name || mySelectedReport.name || `#${mySelectedReport.campaignID || mySelectedReport.campaignId}`}
                       </div>
                     </div>
                     <button
@@ -620,14 +620,14 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                       <div className="text-lg font-semibold text-gray-900">
                         {(() => {
                           const inf = influencerOptions.find(
-                            (i) => String(i.id) === String(selectedReport.influencerId || selectedReport.influencer_id)
+                            (i) => String(i.id) === String(selectedReport.influencerID || selectedReport.influencerId)
                           );
                           return inf?.display_name || inf?.username || selectedReport.influencerName || `#${selectedReport.influencerId || selectedReport.influencer_id}`;
                         })()}
                       </div>
                       <div className="mt-1">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold tracking-tight">
-                          {selectedReport.name || selectedReport.name || `#${selectedReport.campaignId || selectedReport.campaignId}`}
+                          {selectedReport.name || selectedReport.name || `#${selectedReport.campaignID || selectedReport.campaignId}`}
                         </span>
                       </div>
                     </div>
