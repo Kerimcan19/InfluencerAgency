@@ -58,7 +58,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
     (async () => {
       try {
         setInfluencerLoading(true);
-        const res = await apiClient.get('/list-influencers', { params: { campaign_id: selectedCampaign } });
+        const res = await apiClient.get('/list-influencers', { params: {} });
         if (mounted && res.data?.isSuccess) {
           setInfluencers(res.data.data || []);
         } else if (mounted) {

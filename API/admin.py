@@ -494,7 +494,7 @@ def import_mlink_campaigns(
 
 @router.get("/list-influencers")
 def list_influencers(
-    campaign_id: Optional[int],
+    campaign_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
