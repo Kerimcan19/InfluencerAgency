@@ -47,5 +47,10 @@ Frontend: HTML, CSS, JavaScript
 
 📸 Ekran Görüntüleri
 
-![Admin Paneli](1.PNG)
-![Kullanıcı Sepeti](2.PNG)
+![Admin Paneli](1.png)
+![Kullanıcı Sepeti](2.png)
+![Admin Paneli](3.png)
+![Kullanıcı Sepeti](4.png)
+![Admin Paneli](5.png)
+![Kullanıcı Sepeti](6.png)
+![Admin Paneli](7.png)
