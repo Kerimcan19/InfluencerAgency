@@ -108,7 +108,7 @@ class CampaignOut(BaseModel):
     brandingImage: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
         
 
@@ -269,7 +269,7 @@ class ProductOut(ProductBase):
     campaign_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class DashboardSummaryResponse(BaseModel):
     activeCampaigns: int
@@ -289,3 +289,6 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
     confirm_password: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr

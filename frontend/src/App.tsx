@@ -12,6 +12,7 @@ import { useAuth } from './contexts/AuthContext';
 import CompaniesPage from './pages/CompaniesPage';
 import InfluencersPage from './pages/InfluencersPage';
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { SettingsPage } from './pages/SettingsPage';
 
 export type Page = 'dashboard' | 'campaigns' | 'reports' | 'generate-link' | 'companies' | 'influencers' | 'settings';
@@ -55,6 +56,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route
+          path="/forgot-password"
+          element={<ForgotPasswordPage />}
+        />
         <Route
           path="/reset-password"
           element={<ResetPasswordPage />}

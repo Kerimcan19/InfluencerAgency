@@ -93,18 +93,18 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
       // For influencers, use their own ID and name
       const payload = isInfluencer 
         ? {
-            influencerID: user.user.id.toString(),
+            influencerID: user.user.id.toString(), // String'e çevir
             influencerName: user.user.display_name || user.user.username || 'Influencer',
             campaignID: Number(selectedCampaign)
           }
         : {
-            influencerID: selectedInfluencerId,
+            influencerID: selectedInfluencerId?.toString(), // String'e çevir
             influencerName: influencers.find(inf => inf.id == selectedInfluencerId)?.display_name || '',
             campaignID: Number(selectedCampaign)
           };
-
+  
       const response = await apiClient.put('/mlink/generate-link', payload);
-
+  
       // Fixed: Check for data.url property instead of isSuccess only
       if (response.data?.isSuccess && response.data?.data?.url) {
         setGeneratedLink(response.data.data.url);

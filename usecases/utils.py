@@ -5,7 +5,8 @@ from email.message import EmailMessage
 
 
 def send_password_reset_email(to_email: str, reset_url: str) -> None:
-    """Minimal SMTP sender. Configure via env vars: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM."""
+    """Gmail SMTP üzerinden şifre sıfırlama maili gönderir."""
+
     host = os.getenv("SMTP_HOST")
     port = int(os.getenv("SMTP_PORT", "587"))
     user = os.getenv("SMTP_USER")
@@ -13,18 +14,25 @@ def send_password_reset_email(to_email: str, reset_url: str) -> None:
     from_addr = os.getenv("SMTP_FROM", user or "no-reply@example.com")
 
     if not host or not user or not pwd:
-        # If SMTP isn’t configured yet, don’t blow up; log-like behavior.
-        # You can replace this with your project’s logger.
-        print(f"[WARN] SMTP not configured. Password reset URL (send manually): {reset_url}")
+        print(f"[WARN] SMTP yapılandırılmamış. Manuel gönder: {reset_url}")
         return
 
     msg = EmailMessage()
-    msg["Subject"] = "Set your password"
+    msg["Subject"] = "Şifrenizi Belirleyin"
     msg["From"] = from_addr
     msg["To"] = to_email
-    msg.set_content(f"Merhaba,\n\nHesabınızı etkinleştirmek için aşağıdaki bağlantıdan şifrenizi belirleyin:\n{reset_url}\n\nTeşekkürler.")
+    msg.set_content(
+        f"Merhaba,\n\n"
+        f"Hesabınızı etkinleştirmek için aşağıdaki bağlantıya tıklayarak şifrenizi belirleyin:\n\n"
+        f"{reset_url}\n\n"
+        f"Teşekkürler."
+    )
 
-    with smtplib.SMTP(host, port) as s:
-        s.starttls()
-        s.login(user, pwd)
-        s.send_message(msg)
+    try:
+        with smtplib.SMTP(host, port) as s:
+            s.starttls()
+            s.login(user, pwd)
+            s.send_message(msg)
+            print(f"[INFO] Şifre sıfırlama maili gönderildi: {to_email}")
+    except Exception as e:
+        print(f"[ERROR] Mail gönderilemedi: {e}")

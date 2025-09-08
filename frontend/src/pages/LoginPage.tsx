@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { login } from '../services/api';
 import { useLang, translations } from '../contexts/LangContext';
@@ -153,9 +154,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-purple-600 hover:text-purple-500">
+                <Link to="/forgot-password" className="font-medium text-purple-600 hover:text-purple-500">
                   {t('ForgotPassword')}
-                </a>
+                </Link>
               </div>
             </div>
 
