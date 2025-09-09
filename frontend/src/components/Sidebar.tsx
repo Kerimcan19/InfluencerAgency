@@ -9,7 +9,9 @@ import {
   X,
   TrendingUp, 
   Building2,
-  Settings
+  Settings,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLang, translations } from '../contexts/LangContext';
@@ -22,7 +24,10 @@ interface SidebarProps {
   onToggle: () => void;
   onLogout: () => void;
   allowedPages: Page[];
+  collapsed?: boolean;
+  onCollapseToggle?: () => void;
 }
+
 const navigation = [
   { name: 'Dashboard', id: 'dashboard', icon: BarChart3 },
   { name: 'Campaigns', id: 'campaigns', icon: Target },
@@ -33,7 +38,7 @@ const navigation = [
   { name: 'Settings', id: 'settings', icon: Settings },
 ];
 
-export function Sidebar({ currentPage, onPageChange, isOpen, onToggle, onLogout, allowedPages }: SidebarProps) {
+export function Sidebar({ currentPage, onPageChange, isOpen, onToggle, onLogout, allowedPages, collapsed = false, onCollapseToggle }: SidebarProps) {
   const { user } = useAuth();
   const { lang, setLang } = useLang();
   const t = (key: string) => translations[lang][key] || key;
@@ -60,22 +65,33 @@ export function Sidebar({ currentPage, onPageChange, isOpen, onToggle, onLogout,
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-slate-800 transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 bg-slate-800 transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${collapsed ? 'w-20' : 'w-64'}
       `}>
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center px-6 bg-slate-900">
-            <div className="flex items-center space-x-3">
+          <div className="flex h-16 items-center px-4 bg-slate-900 justify-between">
+            <div className={`flex items-center ${collapsed ? 'justify-center w-full' : 'space-x-3'}`}>
               <div className="flex items-center justify-center w-8 h-8 bg-purple-600 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">Qubeagency</span>
+              {!collapsed && <span className="text-xl font-bold text-white">Qubeagency</span>}
+            </div>
+            {/* Desktop collapse toggle */}
+            <div className="hidden lg:flex">
+              <button
+                onClick={onCollapseToggle}
+                className="ml-2 rounded-md p-1 text-slate-300 hover:text-white hover:bg-slate-800"
+                aria-label="Toggle sidebar"
+              >
+                {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+              </button>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-4'} py-6 space-y-2`}>
             {visibleLinks.map(item => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
@@ -88,38 +104,38 @@ export function Sidebar({ currentPage, onPageChange, isOpen, onToggle, onLogout,
                     onToggle();
                   }}
                   className={`
-                    group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                    group flex w-full items-center rounded-lg ${collapsed ? 'justify-center' : ''} px-3 py-2 text-sm font-medium transition-colors
                     ${isActive
                       ? 'bg-purple-600 text-white'
                       : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                     }
                   `}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {t(item.name)}
+                  <Icon className={`${collapsed ? '' : 'mr-3'} h-5 w-5`} />
+                  {!collapsed && t(item.name)}
                 </button>
               );
             })}
           </nav>
 
           {/* Language Switcher */}
-          <div className="px-4 pb-2">
+          <div className={`${collapsed ? 'px-2' : 'px-4'} pb-2`}>
             <button
               onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
-              className="w-full rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700 mb-2"
+              className={`w-full rounded-lg ${collapsed ? 'px-2' : 'px-3'} py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700 mb-2`}
             >
-              {lang === 'en' ? t('Turkish') : t('English')}
+              {collapsed ? (lang === 'en' ? 'TR' : 'EN') : (lang === 'en' ? t('Turkish') : t('English'))}
             </button>
           </div>
 
           {/* Logout */}
-          <div className="px-4 pb-6">
+          <div className={`${collapsed ? 'px-2' : 'px-4'} pb-6`}>
             <button
               onClick={onLogout}
-              className="group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+              className={`group flex w-full items-center ${collapsed ? 'justify-center' : ''} rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors`}
             >
-              <LogOut className="mr-3 h-5 w-5" />
-              {t('Logout')}
+              <LogOut className={`${collapsed ? '' : 'mr-3'} h-5 w-5`} />
+              {!collapsed && t('Logout')}
             </button>
           </div>
         </div>

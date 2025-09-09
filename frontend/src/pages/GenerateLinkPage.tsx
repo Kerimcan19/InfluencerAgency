@@ -159,8 +159,8 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300">
-        <div className="px-6 py-4 border-b border-gray-300">
+      <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200">
+        <div className="px-6 py-4 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-gray-900">{t('TrackingLinkDetails')}</h3>
         </div>
         
@@ -173,7 +173,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
                 <select
                   value={selectedCampaign}
                   onChange={e => setSelectedCampaign(e.target.value)}
-                  className="w-full py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200"
+                  className="w-full py-2.5 rounded-xl border border-slate-300 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/40"
                 >
                   <option value="">{t('SelectCampaign')}</option>
                   {campaigns.map(campaign => (
@@ -204,7 +204,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
                     value={selectedInfluencerId || ''}
                     onChange={e => setSelectedInfluencerId(e.target.value ? Number(e.target.value) : null)}
                     disabled={!selectedCampaign || influencerLoading}
-                    className="w-full py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 disabled:opacity-50"
+                    className="w-full py-2.5 rounded-xl border border-slate-300 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/40 disabled:opacity-50"
                   >
                     <option value="">{t('SelectInfluencer')}</option>
                     {influencers.map(inf => (
@@ -223,7 +223,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
             <button
               onClick={handleGenerateLink}
               disabled={!selectedCampaign || isGenerating || (!isInfluencer && !selectedInfluencerId)}
-              className="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 shadow-sm inline-flex items-center"
+              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-xl hover:from-purple-500 hover:to-fuchsia-500 disabled:opacity-50 shadow inline-flex items-center transition-all"
             >
               <Link2 className="h-4 w-4 mr-2" />
               {isGenerating ? t('Generating') : t('GenerateLink')}
@@ -234,21 +234,21 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
 
       {/* Generated Link */}
       {generatedLink && (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300 animate-in fade-in-0 slide-in-from-bottom-4">
-          <div className="px-6 py-4 border-b border-gray-300">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 animate-in fade-in-0 slide-in-from-bottom-4">
+          <div className="px-6 py-4 border-b border-slate-200">
             <h3 className="text-lg font-semibold text-gray-900">{t('LinkGenerated')}</h3>
           </div>
           
           <div className="p-6 space-y-6">
             {/* Link Display */}
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-300">
+            <div className="p-4 bg-gray-50 rounded-xl border border-slate-200">
               <div className="flex items-center justify-between">
                 <code className="text-sm text-gray-800 break-all flex-1 mr-4">
                   {generatedLink}
                 </code>
                 <button
                   onClick={handleCopyLink}
-                  className={`inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                     copied
                       ? 'bg-green-100 text-green-800 border border-green-300'
                       : 'bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-300'
@@ -271,17 +271,17 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
 
             {/* Link Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                 <div className="font-medium text-blue-900">{t('Influencer')}</div>
                 <div className="text-blue-700 mt-1">{influencerName}</div>
               </div>
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+              <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
                 <div className="font-medium text-purple-900">{t('Campaign')}</div>
                 <div className="text-purple-700 mt-1">
                   {selectedCampaignObj?.name}
                 </div>
               </div>
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="p-4 bg-green-50 rounded-xl border border-green-200">
                 <div className="font-medium text-green-900">{t('InfluencerCommission')}</div>
                 <div className="text-green-700 mt-1">
                   {selectedCampaignObj?.influencerCommissionRate}%
@@ -290,7 +290,7 @@ export function GenerateLinkPage({ onAddToast }: GenerateLinkPageProps) {
             </div>
 
             {/* Instructions */}
-            <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
               <div className="flex">
                 <div>
                   <p className="text-sm text-amber-700">

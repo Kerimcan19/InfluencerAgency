@@ -205,7 +205,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                   <div className="p-8 border-b-2 border-gray-300 flex items-center justify-between">
                     <div>
                       <div className="text-lg font-semibold text-gray-900">
-                        {mySelectedReport.name || mySelectedReport.name || `#${mySelectedReport.campaignID || mySelectedReport.campaignId}`}
+                        {mySelectedReport.name || mySelectedReport.name || `#${mySelectedReport.campaignID || mySelectedReport.campaignID}`}
                       </div>
                     </div>
                     <button
@@ -337,9 +337,9 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
         setInfluencers(reportsArr);
         setReportsResponse({
           ...payload,
-          activeInfluencers: new Set(reportsArr.map(r => r.influencerID || r.influencer_id)).size,
-          totalInfluencerCommission: reportsArr.reduce(
-            (sum, r) => sum + Number(r.influencerCommissionAmount ?? 0),
+          activeInfluencers: new Set(reportsArr.map((r: any) => r.influencerID || r.influencer_id)).size,
+          totalInfluencerCommission: (reportsArr as any[]).reduce(
+            (sum: number, r: any) => sum + Number(r.influencerCommissionAmount ?? 0),
             0
           ).toLocaleString(),
         });
@@ -390,7 +390,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
         <div className="mt-4 sm:mt-0">
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 transition-all"
           >
             <Download className="h-4 w-4 mr-2" />
             {t('ExportCSV')}
@@ -399,7 +399,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-2xl shadow p-6 border border-slate-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -408,7 +408,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              className="block w-full rounded-xl border-slate-300 shadow-sm focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 sm:text-sm"
             >
               <option value="7days">{t('Last7Days')}</option>
               <option value="30days">{t('Last30Days')}</option>
@@ -424,7 +424,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
             <select
               value={selectedInfluencer}
               onChange={(e) => setSelectedInfluencer(e.target.value)}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              className="block w-full rounded-xl border-slate-300 shadow-sm focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 sm:text-sm"
             >
               <option value="all">{t('AllInfluencers')}</option>
               {loading ? (
@@ -442,7 +442,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
           <div className="flex items-end">
             <button
               onClick={() => onAddToast('Filters applied successfully', 'success')}
-              className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-slate-300 rounded-xl shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-gray-50 transition-colors"
             >
               <Filter className="h-4 w-4 mr-2" />
               {t('ApplyFilters')}
@@ -453,7 +453,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-2xl shadow p-6 border border-slate-200">
           <div className="flex items-center">
             <div className="p-3 rounded-lg bg-blue-50">
               <Users className="h-6 w-6 text-blue-600" />
@@ -467,7 +467,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-2xl shadow p-6 border border-slate-200">
           <div className="flex items-center">
             <div className="p-3 rounded-lg bg-green-50">
               <TrendingUp className="h-6 w-6 text-green-600" />
@@ -484,7 +484,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
 
 
       {/* Performance Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-2xl shadow overflow-hidden border border-slate-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">{t('InfluencerReports')}</h3>
           <p className="text-sm text-gray-500">{t('DetailedListOfInfluencerReports')}</p>
@@ -574,7 +574,7 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                     {/* Commission (RIGHT, green) */}
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <span className="inline-block px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-sm font-semibold tracking-tight tabular-nums">
-                        ₺{Number(r.influencerCommisionAmount ?? 0).toLocaleString()}
+                        ₺{Number(r.influencerCommissionAmount ?? 0).toLocaleString()}
                       </span>
                     </td>
 
@@ -689,13 +689,13 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Brand')}</span>
                           <span className="tabular-nums">
-                            ₺{Number(selectedReport.brandCampaignCommisionAmount ?? 0).toLocaleString()}
+                            ₺{Number(selectedReport.brandCommissionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Influencer')}</span>
                           <span className="tabular-nums">
-                            ₺{Number(selectedReport.influencerCommisionAmount ?? 0).toLocaleString()}
+                            ₺{Number(selectedReport.influencerCommissionAmount ?? 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -722,13 +722,13 @@ export function ReportsPage({ onAddToast }: ReportsPageProps) {
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Brand')}</span>
                           <span className="tabular-nums">
-                            {Number(selectedReport.brandCampaignCommisionRate ?? 0).toFixed(2)}%
+                            {Number(selectedReport.brandCommissionRate ?? 0).toFixed(2)}%
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">{t('Influencer')}</span>
                           <span className="tabular-nums">
-                            {Number(selectedReport.influencerCommisionRate ?? 0).toFixed(2)}%
+                            {Number(selectedReport.influencerCommissionRate ?? 0).toFixed(2)}%
                           </span>
                         </div>
                         <div className="flex items-center justify-between">

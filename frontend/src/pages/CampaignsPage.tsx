@@ -143,9 +143,9 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
             {t('CampaignsTitle')}
           </p>
         </div>
-        <div className="mt-4 sm:mt-0">
+        <div className="mt-4 sm:mt-0 flex items-center gap-3">
           {user?.role === 'admin' && (
-            <button onClick={openCreate} className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors">
+            <button onClick={openCreate} className="inline-flex items-center px-4 py-2 rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 transition-all">
               <Plus className="h-4 w-4 mr-2" /> {t('NewCampaign')}
             </button>
           )}
@@ -156,7 +156,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-2xl shadow p-6 border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1 max-w-md">
             <div className="relative">
@@ -166,7 +166,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                 placeholder= {t('SearchCampaign')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 sm:text-sm"
               />
             </div>
           </div>
@@ -175,7 +175,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-lg border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+              className="rounded-xl border-slate-300 text-sm shadow-sm focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500"
             >
               <option value="all">{t('AllStatus')}</option>
               <option value="active">{t('Active')}</option>
@@ -183,19 +183,19 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
               <option value="ended">{t('Ended')}</option>
             </select>
             
-            <div className="flex rounded-lg border border-gray-300">
+            <div className="flex rounded-xl border border-slate-300 overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-1 text-sm rounded-l-lg ${
-                  viewMode === 'grid' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:text-gray-700'
+                className={`px-3 py-1.5 text-sm ${
+                  viewMode === 'grid' ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('Grid')}
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-3 py-1 text-sm rounded-r-lg border-l border-gray-300 ${
-                  viewMode === 'table' ? 'bg-purple-100 text-purple-700' : 'text-gray-500 hover:text-gray-700'
+                className={`px-3 py-1.5 text-sm border-l border-slate-300 ${
+                  viewMode === 'table' ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('Table')}
@@ -210,23 +210,23 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
             placeholder={t('CampaignName')}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="px-3 py-2 border rounded-md w-60"
+            className="px-3 py-2 border border-slate-300 rounded-xl shadow-sm w-60 focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500"
           />
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500"
           />
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500"
           />
           <button
             onClick={fetchCampaigns}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white px-4 py-2 shadow hover:from-purple-500 hover:to-fuchsia-500 transition-all"
           >
             {t('Search')}
           </button>
@@ -292,13 +292,13 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
           {filteredCampaigns.map((campaign, index) => (
             <div
               key={campaign.id}
-              className="bg-white rounded-lg shadow hover:shadow-md transition-all duration-200 overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4"
+              className="bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-200 overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4 hover:-translate-y-0.5 border border-slate-200"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="aspect-w-16 aspect-h-9">
                 <img
                 src={campaign.brandingImage}
-                className="w-full h-48 object-cover rounded-t-lg"
+                className="w-full h-48 object-cover"
                 alt={campaign.name}
               />
               </div>
@@ -327,7 +327,7 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                 
                 <button
                   onClick={() => handleViewDetails(campaign)}
-                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-purple-300 rounded-lg text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 shadow transition-all"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   {t('ViewDetails')}
@@ -366,11 +366,11 @@ export function CampaignsPage({ onAddToast }: CampaignsPageProps) {
                 <tr key={campaign.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                     <img
-                      src={campaign.brandingImage}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                      alt={campaign.name}
-                    />
+                      <img
+                        src={campaign.brandingImage}
+                        className="h-14 w-20 object-cover rounded-md border border-slate-200"
+                        alt={campaign.name}
+                      />
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
                           {campaign.name}
@@ -611,7 +611,7 @@ function CompanySelect({
       {open && (
         <div className="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow max-h-60 overflow-auto">
           {filtered.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-gray-500">{t('NoResults')}</div>
+            <div className="px-3 py-2 text-sm text-gray-500">{t('noResults')}</div>
           ) : (
             filtered.map((i) => (
               <button

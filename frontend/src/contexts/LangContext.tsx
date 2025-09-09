@@ -33,6 +33,11 @@ export const useLang = () => {
 export const translations: Record<'tr' | 'en', Record<string, string>> = {
   tr: {
     // General
+    SendResetLink:"Şifre Sıfırlama Linki Gönder",
+    ResetLinkSentIfExists:"Eğer hesabınız mevcut bir hesapla ilişkilendirilmişse, şifre sıfırlama linki gönderildi.",
+    Sending:"Gönderiliyor...",
+    Back:"Geri",
+    ForgotPasswordTitle: "Şifremi Unuttum",
     loading: "Yükleniyor...",
     noResults: "Sonuç bulunamadı",
     adjust: "Filtreleri değiştirerek tekrar deneyin.",
@@ -290,6 +295,9 @@ export const translations: Record<'tr' | 'en', Record<string, string>> = {
 
   en: {
     // General
+    ForgotPasswordTitle: "Forgot Password",
+    SendResetLink: "Send Reset Link",
+    Sending: "Sending...",
     loading: "Loading...",
     noResults: "No results found",
     adjust: "Try adjusting your filters.",

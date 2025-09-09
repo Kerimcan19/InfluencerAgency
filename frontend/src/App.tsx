@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -14,6 +14,9 @@ import InfluencersPage from './pages/InfluencersPage';
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { SettingsPage } from './pages/SettingsPage';
+import HomePage from './pages/HomePage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 
 export type Page = 'dashboard' | 'campaigns' | 'reports' | 'generate-link' | 'companies' | 'influencers' | 'settings';
 
@@ -26,6 +29,7 @@ const rolePages: Record<string, Page[]> = {
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { toasts, addToast, removeToast } = useToast();
   const { token, login, logout } = useAuth();
   const { user } = useAuth();
@@ -56,6 +60,20 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/login"
+          element={
+            token ? (
+              <Navigate to="/app" replace />
+            ) : (
+              <>
+                <LoginPage onLogin={handleLogin} />
+                <Toast toasts={toasts} onRemove={removeToast} />
+              </>
+            )
+          }
+        />
         <Route
           path="/forgot-password"
           element={<ForgotPasswordPage />}
@@ -64,6 +82,8 @@ function App() {
           path="/reset-password"
           element={<ResetPasswordPage />}
         />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route
           path="*"
           element={
@@ -81,8 +101,10 @@ function App() {
                   onToggle={() => setSidebarOpen(!sidebarOpen)}
                   onLogout={handleLogout}
                   allowedPages={allowedPages}
+                  collapsed={sidebarCollapsed}
+                  onCollapseToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
                 />
-                <div className="lg:pl-64">
+                <div className={`transition-all ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
                   <main className="py-6">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                       {allowedPages.includes(currentPage) ? (

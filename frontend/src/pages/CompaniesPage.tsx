@@ -292,7 +292,7 @@ const CompaniesPage: React.FC = () => {
         <button
           onClick={fetchCompanies}
           disabled={loading}
-          className="rounded-xl bg-black text-white px-4 py-2 hover:opacity-90 disabled:opacity-60"
+          className="rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white px-4 py-2 hover:from-purple-500 hover:to-fuchsia-500 disabled:opacity-60 shadow transition-all"
         >
           {loading ? t('loading') : t('Filter')}
         </button>
@@ -309,7 +309,7 @@ const CompaniesPage: React.FC = () => {
       )}
 
       {/* table */}
-      <div className="overflow-x-auto border rounded-2xl">
+      <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -345,7 +345,7 @@ const CompaniesPage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => openEdit(c)}
-                      className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 bg-purple-100 text-purple-700 hover:bg-purple-200"
                     >
                       <Edit className="w-4 h-4" /> {t('Edit')}
                     </button>
@@ -502,7 +502,7 @@ const FilterInput: React.FC<{
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring"
+      className="w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500/40"
     />
   </div>
 );
@@ -520,7 +520,7 @@ const Input: React.FC<{ label: string; value: string; onChange: (v: string) => v
     <input
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-xl border px-3 py-2 focus:outline-none focus:ring"
+      className="rounded-xl border border-slate-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500/40"
     />
   </label>
 );
@@ -532,15 +532,15 @@ const TextArea: React.FC<{ label: string; value: string; onChange: (v: string) =
       value={value}
       onChange={(e) => onChange(e.target.value)}
       rows={3}
-      className="rounded-xl border px-3 py-2 focus:outline-none focus:ring"
+      className="rounded-xl border border-slate-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500/40"
     />
   </label>
 );
 
 const Modal: React.FC<{ title: string; onClose: () => void; children: React.ReactNode }> = ({ title, onClose, children }) => (
   <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-    <div className="w-full max-w-2xl rounded-2xl bg-white shadow-lg">
-      <div className="flex items-center justify-between border-b px-5 py-4">
+    <div className="w-full max-w-2xl rounded-2xl bg-white shadow-lg border border-slate-200">
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <h2 className="text-lg font-semibold">{title}</h2>
         <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl">
           <X className="w-5 h-5" />

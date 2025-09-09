@@ -182,7 +182,7 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 disabled:opacity-50 transition-all"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             {t('Refresh')}
@@ -227,7 +227,7 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
       </div>
 
       {/* Performance Chart */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-2xl shadow border border-slate-200">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -242,7 +242,7 @@ export function DashboardPage({ onAddToast }: DashboardPageProps) {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-2xl shadow border border-slate-200">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('RecentActivity')}</h3>
           <div className="space-y-4">
